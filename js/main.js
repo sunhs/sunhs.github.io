@@ -4,7 +4,7 @@ var duoshuoName = 'hyesun'; // change to your DUOSHUO name
 var duoshuoQuery = {short_name: duoshuoName}; // change to your duoshuo name
 function toggleDuoshuoComments(container) {
     var el = document.createElement('div');
-    el.setAttribute('data-thread-key', post.pathname);
+    el.setAttribute('data-thread-key', postTitle);
     el.setAttribute('data-url', postHref);
     el.setAttribute('data-title', postTitle);
     el.setAttribute('data-author-key', duoshuoName); // change to your duoshuo name
