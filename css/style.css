@@ -125,7 +125,7 @@ body,
 }
 body {
   background: #eee;
-  font: 14px/1.6em "微软雅黑", "Microsoft Yahei", "Droid Sans", Helvetica Neue, Helvetica, Arial, sans-serif;
+  font: 18px/1.6em "微软雅黑", "Microsoft Yahei", "Droid Sans", Helvetica Neue, Helvetica, Arial, sans-serif;
   -webkit-text-size-adjust: 100%;
 }
 .outer {
@@ -226,7 +226,7 @@ body {
 .widget h6 {
   font-weight: bold;
   color: #000;
-  font-family: "Droid Serif", Georgia, Serif;
+  font-family: "微软雅黑", "Microsoft Yahei", "Droid Sans", Helvetica Neue, Helvetica, Arial, sans-serif;
 }
 .article-entry h1 a,
 .widget h1 a,
@@ -272,27 +272,27 @@ body {
 }
 .article-entry h1,
 .widget h1 {
-  font-size: 2em;
+  font-size: 3em;
 }
 .article-entry h2,
 .widget h2 {
-  font-size: 1.5em;
+  font-size: 2.5em;
 }
 .article-entry h3,
 .widget h3 {
-  font-size: 1.3em;
+  font-size: 2em;
 }
 .article-entry h4,
 .widget h4 {
-  font-size: 1.2em;
+  font-size: 1.7em;
 }
 .article-entry h5,
 .widget h5 {
-  font-size: 1em;
+  font-size: 1.5em;
 }
 .article-entry h6,
 .widget h6 {
-  font-size: 1em;
+  font-size: 1.2em;
   color: #999;
 }
 .article-entry hr,
@@ -480,9 +480,9 @@ body {
 .nav-icon {
   font-family: FontAwesome;
   text-align: center;
-  font-size: 14px;
-  width: 14px;
-  height: 14px;
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
   padding: 20px 15px;
   position: relative;
   cursor: pointer;
@@ -714,7 +714,7 @@ a.article-title:hover {
   color: #777;
 }
 .article-entry blockquote footer {
-  font-size: 14px;
+  font-size: 18px;
   margin: 1.6em 0;
   font-family: "微软雅黑", "Microsoft Yahei", "Droid Sans", Helvetica Neue, Helvetica, Arial, sans-serif;
 }
@@ -1252,7 +1252,7 @@ a.article-title:hover {
   border-width: 1px 0;
   overflow: auto;
   color: #f8f8f2;
-  line-height: 22.400000000000002px;
+  line-height: 28.8px;
 }
 .article-entry .highlight .gutter pre,
 .article-entry .gist .gist-file .gist-data .line-numbers {
@@ -1314,7 +1314,7 @@ a.article-title:hover {
   padding-right: 20px;
 }
 .article-entry .highlight .line {
-  height: 22.400000000000002px;
+  height: 28.8px;
 }
 .article-entry .gist {
   margin: 0 -20px;
