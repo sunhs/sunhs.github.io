@@ -90,15 +90,15 @@
     <div class="article-entry" itemprop="articleBody">
       
         <p>第一次使用sae是搭建微信公众号用的，当时直接在sae的editor上写代码，那体验实在过瘾。第二次是课程作业需要用到服务器，所以在sae上面搭建，这回学乖了，搭建本地开发环境进行测试。但是由于缺乏经验，而且教程较为零碎，搭建过程耗时巨大。时隔数月，第三次需要用到本地环境，可是由于更换了电脑，把原来的搭建过程给忘了。于是痛下决心，把过程记录下来，也企盼着搜索教程的人能够找到我这个“心灵驿站”。<br><a id="more"></a><br>正如题目所讲，这篇文章针对的是Django框架。首先你得在sae上面新建应用和开启MySQL数据库服务。sae名义上支持Django框架，但是坑爹得很，仅仅支持版本1.4（或者1.5）。而发展快速、用户众多的Django已经上了版本1.7。为着新特性慕名而来的开发者们，不仅被这个门槛限制住了。好在我们还是有解决方案的。<br><br>sae的代码托管在svn上面，服务器是svn.sinaapp.com，仓库名一般就是sae应用的名字。为了将代码clone到本地，需要svn的工具——一般在搜索引擎上被提及最多的要数tortoise svn。这里对于此工具的使用就不再赘述，网上教程一大把一大把。需要注意的一点是，在clone你的仓库时，会要求你输入用户名和密码，这里并不是你新浪微博的用户名和密码，而是你sae的安全邮箱和安全密码。<br><br>用tortoise把代码clone下来以后，一般是这样的：</p>
-<p><pre><code>应用名</code></pre></p>
+<p><pre><code><br>应用名</code></pre></p>
 <ul>
-<li>版本号<br>— index.wsgi<br>— config.yaml<br>在版本号的文件夹下，运行命令django-admin startproject [项目名]，假设项目名为myapp，则目录结构变成这样：<br><pre><code>应用名</code></pre></li>
+<li>版本号<br>— index.wsgi<br>— config.yaml<br>在版本号的文件夹下，运行命令django-admin startproject [项目名]，假设项目名为myapp，则目录结构变成这样：<br><pre><code><br>应用名</code></pre></li>
 <li>版本号<ul>
 <li>index.wsgi</li>
 <li>config.yaml</li>
 <li>manage.py</li>
 <li>myapp<ul>
-<li>(各种Django生成的文件，包括myapp文件夹，settings.py等等)<br>现在我们把[版本号]下的myapp里面的文件全都移到[版本号]下面，并且添加文件夹site-packages，如此：<br><pre><code>应用名</code></pre></li>
+<li>(各种Django生成的文件，包括myapp文件夹，settings.py等等)<br>现在我们把[版本号]下的myapp里面的文件全都移到[版本号]下面，并且添加文件夹site-packages，如此：<br><pre><code><br>应用名</code></pre></li>
 </ul>
 </li>
 </ul>
