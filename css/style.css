@@ -25,7 +25,7 @@ h6 {
   font-family: Helvetica Neue, Helvetica, Arial, "Lato", sans-serif;
 }
 h1 {
-  font-size: 1.8em;
+  font-size: 2em;
 }
 h2 {
   font-size: 1.5em;
@@ -278,7 +278,7 @@ article .gallery .next:before {
   right: 10px;
 }
 article header {
-  margin-bottom: 24px;
+  margin-bottom: 0px;
 }
 article .icon {
   width: 32px;
@@ -305,7 +305,7 @@ article .icon:before {
 article time {
   color: #999;
   font: 0.7em Helvetica Neue, Helvetica, Arial, "Lato", sans-serif;
-  margin-bottom: 40px;
+  margin-bottom: 1px;
   display: block;
   line-height: 64px;
   float: right;
@@ -322,6 +322,7 @@ article .title a:hover {
   text-decoration: none;
 }
 article .entry {
+  margin-top: 80px;
   text-align: justify;
   line-height: 1.6;
 }
@@ -472,7 +473,7 @@ article .entry .pullquote {
 }
 article footer {
   margin-top: 1em;
-  margin-bottom: 2em;
+  margin-bottom: 1em;
   padding-top: 10px;
   color: #999;
   font-size: 0.9em;
@@ -552,8 +553,6 @@ article footer .addthis iframe {
 #comment {
   padding: 20px;
   background: #fff;
-  -webkit-box-shadow: 1px 2px 3px #ddd;
-  box-shadow: 1px 2px 3px #ddd;
   margin-bottom: 50px;
 }
 #comment .title {
