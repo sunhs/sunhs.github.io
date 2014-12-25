@@ -71,129 +71,6 @@
   
 
     </header>
-    <!-- <div class="entry">
-      
-        <p>第一次使用sae是搭建微信公众号用的，当时直接在sae的editor上写代码，那体验实在过瘾。第二次是课程作业需要用到服务器，所以在sae上面搭建，这回学乖了，搭建本地开发环境进行测试。但是由于缺乏经验，而且教程较为零碎，搭建过程耗时巨大。时隔数月，第三次需要用到本地环境，可是由于更换了电脑，把原来的搭建过程给忘了。于是痛下决心，把过程记录下来，也企盼着搜索教程的人能够找到我这个“心灵驿站”。</p>
-<p>正如题目所讲，这篇文章针对的是Django框架。首先你得在sae上面新建应用和开启MySQL数据库服务。sae名义上支持Django框架，但是坑爹得很，仅仅支持版本1.4（或者1.5）。而发展快速、用户众多的Django已经上了版本1.7。为着新特性慕名而来的开发者们，不仅被这个门槛限制住了。好在我们还是有解决方案的。<br><br>sae的代码托管在svn上面，服务器是svn.sinaapp.com，仓库名一般就是sae应用的名字。为了将代码clone到本地，需要svn的工具——一般在搜索引擎上被提及最多的要数tortoise svn。这里对于此工具的使用就不再赘述，网上教程一大把一大把。需要注意的一点是，在clone你的仓库时，会要求你输入用户名和密码，这里并不是你新浪微博的用户名和密码，而是你sae的安全邮箱和安全密码。<br><br>用tortoise把代码clone下来以后，一般是这样的：</p>
-<pre><code>- 应用名
-  - 版本号
-    - index.wsgi
-    - config.yaml
-</code></pre>
-
-<p>在版本号的文件夹下，运行命令django-admin startproject [项目名]，假设项目名为myapp，则目录结构变成这样：</p>
-<pre><code>- 应用名
-  - 版本号
-    - index.wsgi
-    - config.yaml
-    - manage.py
-    - myapp
-      - (各种Django生成的文件，包括myapp文件夹，settings.py等等)
-</code></pre>
-
-<p>现在我们把[版本号]下的myapp里面的文件全都移到[版本号]下面，并且添加文件夹site-packages，如此：</p>
-<pre><code>- 应用名
-  - 版本号
-    - index.wsgi
-    - config.yaml
-    - manage.py
-    - site-packages
-    - (各种Django生成的文件，包括myapp文件夹，settings.py等等)
-</code></pre>
-
-<p>这时，由于index.wsgi是作为网站的入口，我们需要把入口应用设置为myapp里面的Django应用。所以要修改index.wsgi为：</p>
-<pre><code>import sae
-import os
-import sys
-
-root = os.path.dirname(__file__)
-sys.path.insert(0, os.path.join(root, 'site-packages'))
-
-from myapp import wsgi
-
-application = sae.create_wsgi_app(wsgi.application)
-</code></pre>
-
-<p>接着，我们把Python的Django文件夹（一般位于Python安装目录下的Library/site-packages里）拷贝到site-packages里。由于index.wsgi已经将这个路径添加到os.path里，所以Django已经可以被找到。<br><br>接着，打开index.wsgi，修改成如下：</p>
-<pre><code>name: [应用名]
-version: [版本号]
-
-libraries:
-- name: "django"
-  version: "[Django版本号]"
-</code></pre>
-
-<p>这里又要注意，冒号后面是有空格的。另一方面，应用名不等同于项目名。项目名只是代表你的Django项目，应用名是你在sae上部署的应用的名称，它在目录结构上包含着Django项目。<br><br>至此，我们的应用已经可以支持Django框架的1.7版本（或者，不出意外，可以用此方法支持任意版本）。<br>接下来的部分，我们要使得应用能在本地启动，并且跟数据库交互。<br><br>首先为了使得应用被Django识别，我们要编辑myapp下的settings.py，在INSTALLED_APPS里添加一行</p>
-<pre><code>'myapp',
-</code></pre>
-
-<p>注意不能少了逗号。<br><br>然后我们需要安装python的sae库及mysql库，这些python接口在sae云端都具备了，但是本地我们需要自己安装。</p>
-<pre><code>pip install sae-python-sae
-pip install mysql-python
-</code></pre>
-
-<p>接着是数据库配置，同样在settings.py中添加下列代码：</p>
-<pre><code>if 'SERVER_SOFTWARE' in os.environ:
-    DOMAIN = '[应用url，如http://mysite.sinaapp.com]'
-    DB_HOST = 'w.rdc.sae.sina.com.cn'
-    DB_PORT = '3307'
-    DB_USER = '[你的应用的ACCESSKEY]'
-    DB_PASS = '[你的应用的SECRETKEY]'
-    DB_DB = 'app_[应用名]‘
-    UEDITOR_UPLOAD = {
-        'BACKEND':'DjangoUeditor.saebackend',
-        'DOMAIN':'[应用名]',
-    }
-else:
-    local_db = True
-    DOMAIN = 'http://localhost:8000'
-    CACHES_BACKEND = 'django.core.cache.backends.memcached.MemcachedCache'
-    if local_db:
-        DB_HOST = 'localhost'
-        DB_PORT = '[你的本地数据库服务的端口]'
-        DB_USER = '[你的本地数据库服务的用户名]'
-        DB_PASS = '[你的本地数据库服务的密码]'
-        DB_DB = '[你的本地数据库服务的名称]'
-    else:
-        from sae._restful_mysql import monkey
-        monkey.patch()
-        DB_HOST = 'w.rdc.sae.sina.com.cn'
-        DB_PORT = '3307'
-        DB_USER = '[你的应用的ACCESSKEY]'
-        DB_PASS = '[你的应用的SECRETKEY]'
-        DB_DB = ‘app_[应用名]’
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': DB_DB,
-        'USER': DB_USER,
-        'PASSWORD': DB_PASS,
-        'HOST': DB_HOST,
-        'PORT': DB_PORT,
-    }
-}
-</code></pre>
-
-<p>这里关于mysql的一些知识就不赘述了。当时我自己关于mysql服务器，mysql数据库名称，mysql的python接口等等之类的东西也是一头雾水。但是与本次主题关系不大，请自行学习。<br><br>数据库配置的意思是这样的：首先，第一个if测试是否在sae的云端环境，是的话，直接使用它的mysql服务。否则的话，则是本地环境，即else语句。嵌套if的意思是，如果要使用本地数据库，则将数据库配置为本地数据库的参数；否则使用云端数据库。这里比较容易混淆，用下面伪代码解释一下：</p>
-<pre><code>if 云端环境:
-    使用云端数据库
-else:
-    #此时是本地环境
-    if 使用本地数据库:
-        #...
-    else 使用云端数据库：
-        #...
-</code></pre>
-
-<p>不过比较坑爹的是，假如你在本地环境运行时也想使用云端数据库的话，只能手动把local_db设为False，目前我还没发现好的办法。<br>此时我们的配置就都完成啦。<br>接着在应用目录下，使用命令</p>
-<pre><code>dev_server.py
-</code></pre>
-
-<p>就可以启动本地环境（有的系统需要自行在python的sae库里找到dev_server.py文件来启动），接着你在访问本地服务器时，你与数据库的交互就会反映到你决定使用的数据库中（假设你已经把Django的模型应用到数据库中）。<br>而如果在django的python shell里操作，则也是使用你选择的数据库。</p>
-
-      
-    </div> -->
     
       <div class="entry">
         <p>第一次使用sae是搭建微信公众号用的，当时直接在sae的editor上写代码，那体验实在过瘾。第二次是课程作业需要用到服务器，所以在sae上面搭建，这回学乖了，搭建本地开发环境进行测试。但是由于缺乏经验，而且教程较为零碎，搭建过程耗时巨大。时隔数月，第三次需要用到本地环境，可是由于更换了电脑，把原来的搭建过程给忘了。于是痛下决心，把过程记录下来，也企盼着搜索教程的人能够找到我这个“心灵驿站”。</p>
@@ -316,8 +193,20 @@ else:
 <p>就可以启动本地环境（有的系统需要自行在python的sae库里找到dev_server.py文件来启动），接着你在访问本地服务器时，你与数据库的交互就会反映到你决定使用的数据库中（假设你已经把Django的模型应用到数据库中）。<br>而如果在django的python shell里操作，则也是使用你选择的数据库。</p>
 
       </div>
+      <footer>
+        
+        
+  
+  <div class="before-tags"><a></a></div>
+  <div class="tags">
+    <a href="/tags/sae/">sae</a>  <a href="/tags/Django/">Django</a>  <a href="/tags/Python/">Python</a>  <a href="/tags/MySQL/">MySQL</a>  <a href="/tags/技术/">技术</a>  <a href="/tags/编程/">编程</a>  <a href="/tags/心得/">心得</a>
+  </div>
+
+        
+        <div class="clearfix"></div>
+      </footer>
     
-    <footer>
+    <!-- <footer>
       
         
         
@@ -330,7 +219,7 @@ else:
         
       
       <div class="clearfix"></div>
-    </footer>
+    </footer> -->
   </div>
 </article>
 
