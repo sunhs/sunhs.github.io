@@ -1,0 +1,353 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Linux系统编程：执行外部程序 | Sword and Poem</title>
+  <meta name="author" content="Edward Zhu">
+  
+  <meta name="description" content="Just for fun.">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Linux系统编程：执行外部程序"/>
+  <meta property="og:site_name" content="Sword and Poem"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  <link href="/favicon.png" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="Sword and Poem" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+  
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="group-text">
+	<nav id="main-nav">
+	  <ul>
+	    
+	      <li><a href="/">Home</a></li>
+	    
+	      <li><a href="/archives">Archives</a></li>
+	    
+	  </ul>
+	  <div class="clearfix"></div>
+	</nav>
+	<div class="main-header">
+	  <h1><a href="/">Sword and Poem</a></h1>
+	  <h2><a href="/"></a></h2>
+	</div>
+	<div class="clearfix"></div>
+</div></header>
+  <div id="content" class="inner">
+    <div id="main-col"><div id="wrapper"><article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+        <time datetime="2014-12-25T05:57:56.000Z"><a href="/2014-12-25-Linux系统编程：执行外部程序/">2014-12-25</a></time>
+      
+      
+  
+    <h1 class="title">Linux系统编程：执行外部程序</h1>
+  
+
+    </header>
+    <!-- <div class="entry">
+      
+        <p>Linux技术与实践这门课好久没去上了，而期末已然开始张牙舞抓，于是最近不得不开始预习。</p>
+<p>昨夜睡前吃太饱，加之近来心事颇多，以及这不合常理的冬夜里的飞蚊侵扰，我最终没能安稳入睡，于是下床学习。打开老师的C语言源代码，看起来一半懂一半懵。关于fork和execvp这部分十分陌生，在各种博客上潜心学习之后，终于有所突破，在此做下记录。</p>
+<p>首先关于fork()的知识来自于<a href="http://blog.csdn.net/jason314/article/details/5640969" target="_blank" rel="external">jason的专栏</a>，关于执行外部程序的知识来自于<a href="http://qqtx.qq.com/g/0XY81A0YgWwy" target="_blank" rel="external">Jollen’s Blog</a>。</p>
+<p>fork函数通过系统调用创建一个与原进程几乎完全一样的子进程，并且父进程的值会被复制到子进程中。由于fork会把进程当前的情况拷贝一份，因此父进程中已经执行的部分不会在子进程中重复执行。</p>
+<p>fork一次调用，二次返回（突然想起JAVA的一次编写，到处调试）。在父进程中，它会返回子进程的pid，而在子进程中则返回0，这也是判断当前进程是父是子的依据。用jason的话来说，这个过程相当于建立链表，父进程的fork返回值指向子进程的pid，而子进程由于没有子进程，因此fork返回值为0。</p>
+<p>当然，如果fork出错，会返回负值。</p>
+<p>execvp函数的原型是：</p>
+<pre><code><span class="keyword">int</span> execvp(<span class="keyword">const</span> <span class="keyword">char</span> *file, <span class="keyword">char</span> * <span class="keyword">const</span> argv[]);
+</code></pre><p>它会从$PATH中搜索符合file的文件并执行，同时用argv的内容作为参数。</p>
+<p>例如：</p>
+<pre><code><span class="preprocessor">#<span class="keyword">include</span> &lt;iostream&gt;</span>
+
+<span class="keyword">int</span> main() {
+    <span class="keyword">char</span> *argv[] = {<span class="string">"ls"</span>, <span class="string">"-l"</span>, <span class="string">"/etc/passwd"</span>, <span class="number">0</span>};
+    execvp(<span class="string">"ls"</span>, argv);
+}
+</code></pre><p>就会执行</p>
+<pre><code>ls <span class="operator">-l</span> /etc/passwd
+</code></pre><p>execvp在执行失败的时候会返回－1；如果执行成功，则不会返回，而是调用外部程序（例如“ls”）取代原进程的执行空间。因此如果想要通过execvp调用外部程序，最好不要在父进程里调用，而是通过fork一个子进程，让外部程序取代子进程而运行。</p>
+<p>接下来贴上老师的代码（修改了一点）：</p>
+<pre><code><span class="comment">/** prompting shell version 2
+ **
+ **    Solves the `one-shot' problem of version 1
+ **    Uses execvp(), but fork()s first so that the
+ **    shell waits around to perform another command
+ **    New problem: shell catches signals.  Run vi, press ^c.
+ **/</span>
+
+<span class="preprocessor">#<span class="keyword">include</span> &lt;stdio.h&gt;</span>
+<span class="preprocessor">#<span class="keyword">include</span> &lt;signal.h&gt;</span>
+<span class="preprocessor">#<span class="keyword">include</span> &lt;unistd.h&gt;</span>
+<span class="preprocessor">#<span class="keyword">include</span> &lt;stdlib.h&gt;</span>
+<span class="preprocessor">#<span class="keyword">include</span> &lt;string.h&gt;</span>
+
+<span class="preprocessor">#<span class="keyword">define</span> MAXARGS        20                    /* cmdline args    */</span>
+<span class="preprocessor">#<span class="keyword">define</span> ARGLEN        100                   /* token length    */</span>
+
+<span class="keyword">void</span> execute( <span class="keyword">char</span> *arglist[] );
+<span class="keyword">char</span> *makestring( <span class="keyword">char</span> *buf );
+
+<span class="keyword">int</span> main() {
+    <span class="keyword">char</span> *arglist[MAXARGS+<span class="number">1</span>];             <span class="comment">/* an array of ptrs    */</span>
+    <span class="keyword">int</span> numargs;                          <span class="comment">/* index into array    */</span>
+    <span class="keyword">char</span> argbuf[ARGLEN];                  <span class="comment">/* read stuff here    */</span>
+    <span class="keyword">char</span> *makestring();                   <span class="comment">/* malloc etc        */</span>
+
+    numargs = <span class="number">0</span>;
+    <span class="keyword">while</span> ( numargs &lt; MAXARGS ) {
+        <span class="built_in">printf</span>(<span class="string">"Arg[%d]? "</span>, numargs);
+        <span class="keyword">if</span> ( fgets(argbuf, ARGLEN, stdin) &amp;&amp; *argbuf != <span class="string">'\n'</span> )
+            arglist[numargs++] = makestring(argbuf);
+        <span class="keyword">else</span> {
+            <span class="keyword">if</span> ( numargs &gt; <span class="number">0</span> ) {          <span class="comment">/* any args?    */</span>
+                arglist[numargs]=NULL;    <span class="comment">/* close list    */</span>
+                execute( arglist );       <span class="comment">/* do it    */</span>
+                numargs = <span class="number">0</span>;              <span class="comment">/* and reset    */</span>
+            }
+        }
+    }
+    <span class="keyword">return</span> <span class="number">0</span>;
+}
+
+<span class="keyword">void</span> execute( <span class="keyword">char</span> *arglist[] ) {
+<span class="comment">/*
+ *    use fork and execvp and wait to do it
+ */</span>
+    <span class="keyword">int</span>    pid,exitstatus;                   <span class="comment">/* of child    */</span>
+    pid = fork();                         <span class="comment">/* make new process */</span>
+    <span class="keyword">switch</span>( pid ) {
+        <span class="keyword">case</span> -<span class="number">1</span>:    
+            perror(<span class="string">"fork failed"</span>);
+            <span class="built_in">exit</span>(<span class="number">1</span>);
+        <span class="keyword">case</span> <span class="number">0</span>:
+            execvp(arglist[<span class="number">0</span>], arglist);  <span class="comment">/* do it */</span>
+            perror(<span class="string">"execvp failed"</span>);
+            <span class="built_in">exit</span>(<span class="number">1</span>);
+        <span class="keyword">default</span>:
+            <span class="keyword">while</span>( wait(&amp;exitstatus) != pid )
+                ;
+            <span class="built_in">printf</span>(<span class="string">"child exited with status %d,%d\n"</span>, 
+                  exitstatus&gt;&gt;<span class="number">8</span>, exitstatus&amp;<span class="number">0377</span>);
+    }
+}
+
+<span class="keyword">char</span> *makestring( <span class="keyword">char</span> *buf ) {
+<span class="comment">/*
+ * trim off newline and create storage for the string
+ */</span>
+    <span class="keyword">char</span> *cp;
+
+    buf[<span class="built_in">strlen</span>(buf)-<span class="number">1</span>] = <span class="string">'\0'</span>;           <span class="comment">/* trim newline    */</span>
+    cp = <span class="built_in">malloc</span>( <span class="built_in">strlen</span>(buf)+<span class="number">1</span> );        <span class="comment">/* get memory    */</span>
+    <span class="keyword">if</span> ( cp == NULL ) {
+        <span class="comment">/* or die    */</span>
+        <span class="built_in">fprintf</span>(stderr,<span class="string">"no memory\n"</span>);
+        <span class="built_in">exit</span>(<span class="number">1</span>);
+    }
+    <span class="built_in">strcpy</span>(cp, buf);                     <span class="comment">/* copy chars    */</span>
+    <span class="keyword">return</span> cp;                             <span class="comment">/* return ptr*/</span>
+}
+</code></pre><p>这里需要说明一下，程序开头的注释说明这是版本2，所谓的版本1其实就是在execute函数里直接调用execvp系统调用，这样做的坏处，之前就说过了。</p>
+<p>从main函数里我们看出这个程序的目的是不断地读取用户输入的外部命令并执行，因此父进程是绝对不能被系统调用取代的。</p>
+
+      
+    </div> -->
+    
+      <div class="entry">
+        <p>Linux技术与实践这门课好久没去上了，而期末已然开始张牙舞抓，于是最近不得不开始预习。</p>
+<p>昨夜睡前吃太饱，加之近来心事颇多，以及这不合常理的冬夜里的飞蚊侵扰，我最终没能安稳入睡，于是下床学习。打开老师的C语言源代码，看起来一半懂一半懵。关于fork和execvp这部分十分陌生，在各种博客上潜心学习之后，终于有所突破，在此做下记录。</p>
+<p>首先关于fork()的知识来自于<a href="http://blog.csdn.net/jason314/article/details/5640969" target="_blank" rel="external">jason的专栏</a>，关于执行外部程序的知识来自于<a href="http://qqtx.qq.com/g/0XY81A0YgWwy" target="_blank" rel="external">Jollen’s Blog</a>。</p>
+<p>fork函数通过系统调用创建一个与原进程几乎完全一样的子进程，并且父进程的值会被复制到子进程中。由于fork会把进程当前的情况拷贝一份，因此父进程中已经执行的部分不会在子进程中重复执行。</p>
+<p>fork一次调用，二次返回（突然想起JAVA的一次编写，到处调试）。在父进程中，它会返回子进程的pid，而在子进程中则返回0，这也是判断当前进程是父是子的依据。用jason的话来说，这个过程相当于建立链表，父进程的fork返回值指向子进程的pid，而子进程由于没有子进程，因此fork返回值为0。</p>
+<p>当然，如果fork出错，会返回负值。</p>
+<p>execvp函数的原型是：</p>
+<pre><code><span class="keyword">int</span> execvp(<span class="keyword">const</span> <span class="keyword">char</span> *file, <span class="keyword">char</span> * <span class="keyword">const</span> argv[]);
+</code></pre><p>它会从$PATH中搜索符合file的文件并执行，同时用argv的内容作为参数。</p>
+<p>例如：</p>
+<pre><code><span class="preprocessor">#<span class="keyword">include</span> &lt;iostream&gt;</span>
+
+<span class="keyword">int</span> main() {
+    <span class="keyword">char</span> *argv[] = {<span class="string">"ls"</span>, <span class="string">"-l"</span>, <span class="string">"/etc/passwd"</span>, <span class="number">0</span>};
+    execvp(<span class="string">"ls"</span>, argv);
+}
+</code></pre><p>就会执行</p>
+<pre><code>ls <span class="operator">-l</span> /etc/passwd
+</code></pre><p>execvp在执行失败的时候会返回－1；如果执行成功，则不会返回，而是调用外部程序（例如“ls”）取代原进程的执行空间。因此如果想要通过execvp调用外部程序，最好不要在父进程里调用，而是通过fork一个子进程，让外部程序取代子进程而运行。</p>
+<p>接下来贴上老师的代码（修改了一点）：</p>
+<pre><code><span class="comment">/** prompting shell version 2
+ **
+ **    Solves the `one-shot' problem of version 1
+ **    Uses execvp(), but fork()s first so that the
+ **    shell waits around to perform another command
+ **    New problem: shell catches signals.  Run vi, press ^c.
+ **/</span>
+
+<span class="preprocessor">#<span class="keyword">include</span> &lt;stdio.h&gt;</span>
+<span class="preprocessor">#<span class="keyword">include</span> &lt;signal.h&gt;</span>
+<span class="preprocessor">#<span class="keyword">include</span> &lt;unistd.h&gt;</span>
+<span class="preprocessor">#<span class="keyword">include</span> &lt;stdlib.h&gt;</span>
+<span class="preprocessor">#<span class="keyword">include</span> &lt;string.h&gt;</span>
+
+<span class="preprocessor">#<span class="keyword">define</span> MAXARGS        20                    /* cmdline args    */</span>
+<span class="preprocessor">#<span class="keyword">define</span> ARGLEN        100                   /* token length    */</span>
+
+<span class="keyword">void</span> execute( <span class="keyword">char</span> *arglist[] );
+<span class="keyword">char</span> *makestring( <span class="keyword">char</span> *buf );
+
+<span class="keyword">int</span> main() {
+    <span class="keyword">char</span> *arglist[MAXARGS+<span class="number">1</span>];             <span class="comment">/* an array of ptrs    */</span>
+    <span class="keyword">int</span> numargs;                          <span class="comment">/* index into array    */</span>
+    <span class="keyword">char</span> argbuf[ARGLEN];                  <span class="comment">/* read stuff here    */</span>
+    <span class="keyword">char</span> *makestring();                   <span class="comment">/* malloc etc        */</span>
+
+    numargs = <span class="number">0</span>;
+    <span class="keyword">while</span> ( numargs &lt; MAXARGS ) {
+        <span class="built_in">printf</span>(<span class="string">"Arg[%d]? "</span>, numargs);
+        <span class="keyword">if</span> ( fgets(argbuf, ARGLEN, stdin) &amp;&amp; *argbuf != <span class="string">'\n'</span> )
+            arglist[numargs++] = makestring(argbuf);
+        <span class="keyword">else</span> {
+            <span class="keyword">if</span> ( numargs &gt; <span class="number">0</span> ) {          <span class="comment">/* any args?    */</span>
+                arglist[numargs]=NULL;    <span class="comment">/* close list    */</span>
+                execute( arglist );       <span class="comment">/* do it    */</span>
+                numargs = <span class="number">0</span>;              <span class="comment">/* and reset    */</span>
+            }
+        }
+    }
+    <span class="keyword">return</span> <span class="number">0</span>;
+}
+
+<span class="keyword">void</span> execute( <span class="keyword">char</span> *arglist[] ) {
+<span class="comment">/*
+ *    use fork and execvp and wait to do it
+ */</span>
+    <span class="keyword">int</span>    pid,exitstatus;                   <span class="comment">/* of child    */</span>
+    pid = fork();                         <span class="comment">/* make new process */</span>
+    <span class="keyword">switch</span>( pid ) {
+        <span class="keyword">case</span> -<span class="number">1</span>:    
+            perror(<span class="string">"fork failed"</span>);
+            <span class="built_in">exit</span>(<span class="number">1</span>);
+        <span class="keyword">case</span> <span class="number">0</span>:
+            execvp(arglist[<span class="number">0</span>], arglist);  <span class="comment">/* do it */</span>
+            perror(<span class="string">"execvp failed"</span>);
+            <span class="built_in">exit</span>(<span class="number">1</span>);
+        <span class="keyword">default</span>:
+            <span class="keyword">while</span>( wait(&amp;exitstatus) != pid )
+                ;
+            <span class="built_in">printf</span>(<span class="string">"child exited with status %d,%d\n"</span>, 
+                  exitstatus&gt;&gt;<span class="number">8</span>, exitstatus&amp;<span class="number">0377</span>);
+    }
+}
+
+<span class="keyword">char</span> *makestring( <span class="keyword">char</span> *buf ) {
+<span class="comment">/*
+ * trim off newline and create storage for the string
+ */</span>
+    <span class="keyword">char</span> *cp;
+
+    buf[<span class="built_in">strlen</span>(buf)-<span class="number">1</span>] = <span class="string">'\0'</span>;           <span class="comment">/* trim newline    */</span>
+    cp = <span class="built_in">malloc</span>( <span class="built_in">strlen</span>(buf)+<span class="number">1</span> );        <span class="comment">/* get memory    */</span>
+    <span class="keyword">if</span> ( cp == NULL ) {
+        <span class="comment">/* or die    */</span>
+        <span class="built_in">fprintf</span>(stderr,<span class="string">"no memory\n"</span>);
+        <span class="built_in">exit</span>(<span class="number">1</span>);
+    }
+    <span class="built_in">strcpy</span>(cp, buf);                     <span class="comment">/* copy chars    */</span>
+    <span class="keyword">return</span> cp;                             <span class="comment">/* return ptr*/</span>
+}
+</code></pre><p>这里需要说明一下，程序开头的注释说明这是版本2，所谓的版本1其实就是在execute函数里直接调用execvp系统调用，这样做的坏处，之前就说过了。</p>
+<p>从main函数里我们看出这个程序的目的是不断地读取用户输入的外部命令并执行，因此父进程是绝对不能被系统调用取代的。</p>
+
+      </div>
+    
+    <footer>
+      
+        
+        
+  
+  <div class="before-tags"><a></a></div>
+  <div class="tags">
+    <a href="/tags/C/">C</a>  <a href="/tags/Linux/">Linux</a>  <a href="/tags/编程/">编程</a>  <a href="/tags/fork/">fork</a>  <a href="/tags/execvp/">execvp</a>
+  </div>
+
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+<section id="comment">
+  <h1 class="title">留言</h1>
+  <!-- <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div> -->
+  <!-- 多说评论框 start -->
+  <div class="ds-thread" data-thread-key="2014-12-25-Linux系统编程：执行外部程序/" data-title="Linux系统编程：执行外部程序" data-url="http://sunhs.github.io/2014-12-25-Linux系统编程：执行外部程序/"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"hyesun"};
+    (function() {
+                var ds = document.createElement('script');
+                    ds.type = 'text/javascript';ds.async = true;
+                            ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                                   ds.charset = 'UTF-8';
+                                              (document.getElementsByTagName('head')[0] 
+                                                                                         || document.getElementsByTagName('body')[0]).appendChild(ds);
+                                                                                         })();
+                                                                                         </script>
+<!-- 多说公共JS代码 end -->  
+</section>
+</div></div>
+    <div class="clearfix"></div>
+  </div>
+
+  <div id="footer-wrapper">
+    <footer id="footer" class="inner">
+<div class="aligncenter">
+	<a href="https://github.com/cinvro/hexo-theme-perry">Perry</a> by <a href="http://cinvro.com">cinvro </a>
+</div>
+
+<div class="aligncenter">
+  
+  &copy; 2014 Edward Zhu
+  
+</div>
+
+<div class="clearfix"></div></footer>
+    <script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>
