@@ -13,7 +13,7 @@ body {
   background: #fff;
   color: #444;
   font-family: "Helvetica Neue", "Helvetica", Arial, sans-serif;
-  font-size: 1em;
+  font-size: 1.1em;
   text-shadow: 0 0 1px transparent;
 }
 h1,
@@ -83,7 +83,7 @@ a {
 }
 #main-col .post-content {
   margin: 0 auto;
-  width: 600px;
+  width: 900px;
 }
 @media screen and (max-width: 1024px) {
   #main-col .post-content {
@@ -340,6 +340,10 @@ article .entry h6,
 article .entry .video-container {
   margin-top: 5px;
 }
+article .entry p {
+  margin-bottom: 20px;
+  padding: 15px;
+}
 article .entry blockquote {
   border-top: 1px solid #ddd;
   border-bottom: 1px solid #ddd;
@@ -549,6 +553,87 @@ article footer .addthis {
 }
 article footer .addthis iframe {
   margin-top: 0;
+}
+article footer #article-nav {
+  zoom: 1;
+  position: relative;
+}
+article footer #article-nav:before,
+article footer #article-nav:after {
+  content: "";
+  display: table;
+}
+article footer #article-nav:after {
+  clear: both;
+}
+@media mq-normal {
+  article footer #article-nav {
+    margin: block-margin 0;
+  }
+  article footer #article-nav:before {
+    content: "";
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+    background: #ddd;
+    -webkit-box-shadow: 0 1px 2px #fff;
+    box-shadow: 0 1px 2px #fff;
+  }
+}
+article footer .article-nav-link-wrap {
+  text-decoration: none;
+  text-shadow: 0 1px #fff;
+  color: color-grey;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  margin-top: block-margin;
+  display: block;
+}
+article footer .article-nav-link-wrap:hover {
+  color: color-default;
+}
+@media mq-normal {
+  article footer .article-nav-link-wrap {
+    width: 50%;
+    margin-top: 0;
+  }
+}
+article footer #article-nav-newer {
+  float: left;
+  text-align: left;
+}
+@media mq-normal {
+  article footer #article-nav-newer {
+    float: left;
+    text-align: right;
+    padding-right: 20px;
+  }
+}
+article footer #article-nav-older {
+  float: right;
+  text-align: right;
+}
+@media mq-normal {
+  article footer #article-nav-older {
+    float: right;
+    text-align: left;
+    padding-left: 20px;
+  }
+}
+article footer .article-nav-caption {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #ddd;
+  line-height: 1em;
+  font-weight: bold;
+}
+#article-nav-newer article footer .article-nav-caption {
+  margin-right: -2px;
+}
+article footer .article-nav-title {
+  font-size: 0.85em;
+  line-height: line-height;
+  margin-top: 0.5em;
 }
 #comment {
   padding: 20px;
