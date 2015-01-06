@@ -1,0 +1,186 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>automator workflow实现dropbox同步任意文件(夹) | Sword and Poem</title>
+  <meta name="author" content="Edward Zhu">
+  
+  <meta name="description" content="Just for fun.">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="automator workflow实现dropbox同步任意文件(夹)"/>
+  <meta property="og:site_name" content="Sword and Poem"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  <link href="/favicon.png" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="Sword and Poem" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+  
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="group-text">
+	<nav id="main-nav">
+	  <ul>
+	    
+	      <li><a href="/">Home</a></li>
+	    
+	      <li><a href="/archives">Archives</a></li>
+	    
+	  </ul>
+	  <div class="clearfix"></div>
+	</nav>
+	<div class="main-header">
+	  <h1><a href="/">Sword and Poem</a></h1>
+	  <h2><a href="/"></a></h2>
+	</div>
+	<div class="clearfix"></div>
+</div></header>
+  <div id="content" class="inner">
+    <div id="main-col"><div id="wrapper"><article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+        <time datetime="2015-01-06T05:45:06.000Z"><a href="/2015-01-06-automator-workflow实现dropbox同步任意文件-夹/">2015-01-06</a></time>
+      
+      
+  
+    <h1 class="title">automator workflow实现dropbox同步任意文件(夹)</h1>
+  
+
+    </header>
+    
+      <div class="entry">
+        <p>用坚果云有一段时间了，感觉还行。据说这是国内唯一足以媲美dropbox的网盘服务。但是这段时间下来，心里总有点不舒服。归根结底，是我对网盘没有一个明确的规划，导致里面的文件杂乱无章，每次整理都是满满的怨念。</p>
+<p>最近跟别人一起租服务器，与shadowsocks私奔到墙外。心里思量着，既然有了出墙的机会，何不趁此把赞誉满钵的dropbox收入麾下。想来坚果云虽好，但总归有种“备胎”的感觉（坚果云用户轻喷…），而且界面上dropbox要更胜一筹，应用支持也比较广泛，最后决定抛弃宝马，坐上玛莎拉蒂（之所以这样比喻，是因为我对汽车一无所知，但又从众地认为后者要优于前者；这正如我对网盘的理解）。</p>
+<p>但是一安装Mac版的dropbox，我就发现有点不对劲。如此知名的软件，在如此知名的平台上，竟然不具备其追赶者坚果云所拥有的同步任意文件夹的功能。如果要同步任何文件（夹），就不得不把整个文件拖进唯一的dropbox同步文件夹里。我有轻微的完美主义，这让我心里有点疙瘩；但是又不愿在好不容易做出选择之后又回归坚果云。我同学说，这就是“你爱用用，不用滚”的高冷气质。在他的推荐下，我装上macdropany。看了这玩意的官方介绍，原来dropbox在同步symbolic link的时候，实际上会同步原文件。这实在极其科学，因为我可以用shell脚本来创建软链接。</p>
+<p>那么问题来了，我该怎样触发这个shell脚本呢，同时，我要如何获得选取的文件（夹）的名字呢？</p>
+<p>前面提到，我有轻微的完美主义。其实不仅如此，我还有轻微的洁癖。为了使dropbox能够同步任意文件夹（并且我认为这是它应该默认提供的功能），我竟然要额外安装一个app，这让我有点不爽。最近听说Alfred的workflow很牛逼，可是价格略贵。经过一番谷歌，原来用automator就可以实现我想做的事情。</p>
+<p>说起automator，我们的邂逅比较坎坷。刚买来电脑时，看到这个拿枪的小玩意，我就猜想是跟自动化工作有关的东西。可是Mac的翻译有时让我摸不着头脑——当我打开automator的时候，它让我“新建文稿”——nani，这玩意又是个文档编辑相关的？于是我把它。。。关掉了。直到这个时候，我才知道我误会了。这玩意也是用来创建工作流的。</p>
+<p>那么，经过一番搜索，新建文稿的时候，选择“服务”。因为我想要把它做成右键服务菜单。</p>
+<p>这个workflow只需简单的两个流程：第1是“获取所选的Finder项目”，第2是“运行AppleScript”。</p>
+<p>AppleScript代码如下：</p>
+<pre><code><span class="function_start"><span class="keyword">on</span></span> <span class="command">run</span> {input, parameters}
+
+    <span class="comment">(* Your script goes here *)</span>
+    <span class="keyword">tell</span> <span class="type">application</span> <span class="string">"Finder"</span>
+    <span class="keyword">set</span> dropBoxPath <span class="keyword">to</span> <span class="string">"/Users/edward/Dropbox"</span>
+    <span class="keyword">set</span> filelist <span class="keyword">to</span> input <span class="keyword">as</span> <span class="type">list</span>
+    <span class="keyword">set</span> curFile <span class="keyword">to</span> <span class="property">item</span> <span class="number">1</span> <span class="keyword">of</span> filelist
+    <span class="keyword">set</span> curFilePath <span class="keyword">to</span> <span class="property">POSIX path</span> <span class="keyword">of</span> curFile <span class="keyword">as</span> <span class="type">string</span>
+    <span class="keyword">repeat</span> <span class="keyword">while</span> curFilePath <span class="keyword">ends with</span> <span class="string">"/"</span>
+        <span class="keyword">set</span> curFilePath <span class="keyword">to</span> <span class="property">characters</span> <span class="number">1</span> <span class="keyword">thru</span> ((<span class="command">count</span> <span class="keyword">of</span> curFilePath) - <span class="number">1</span>) <span class="keyword">of</span> curFilePath <span class="keyword">as</span> <span class="type">string</span>
+    <span class="keyword">end</span> <span class="keyword">repeat</span>
+    <span class="keyword">set</span> curFilePath <span class="keyword">to</span> <span class="property">quoted form</span> <span class="keyword">of</span> curFilePath
+<span class="keyword">end</span> <span class="keyword">tell</span>
+    <span class="comment">--display dialog curFilePath</span>
+    <span class="command">do shell script</span> <span class="string">"ln -s "</span> &amp; curFilePath &amp; <span class="string">" "</span> &amp; dropBoxPath
+<span class="keyword">end</span> <span class="command">run</span>
+</code></pre><p>本来想着把workflow做的更完善点，让每个人都能直接用。但是这样一来，需要判断用户是否首次使用；如果是，要把用户指定的dropbox文件夹存入磁盘；此外，用户修改了dropbox文件夹时，workflow还要提供修改的途径。。。这样一来，越来越接近于做成一个app，违背我不想安装macdropany的初衷。</p>
+<p>所以这里直接贴出代码，也十分简单。如果你想使用，只需要用automator打开这个workflow，把脚本里的</p>
+<pre><code><span class="keyword">set</span> dropBoxPath <span class="keyword">to</span> <span class="string">"/Users/edward/Dropbox"</span>
+</code></pre><p>的路径修改成你自己的，再保存到”~/Library/Services（这就是右键服务菜单项存放的目录）”就行啦。</p>
+<p>接下来，右键点击任意文件（夹），看看是不是会多出一个”sync with dropbox”的选项？当然，如果你把workflow改成其他名字，菜单项的名字也会随之改变。</p>
+<p>昨晚睡到半夜，燥热难耐（这鬼天气），下来研究了2个多钟。初次写AppleScript，如若丑陋繁琐，请多多指教。后面共享了workflow的dropbox链接。</p>
+<p>Download me:</p>
+<p><a href="https://www.dropbox.com/s/0j7zvm9rlz2gil1/sync%20with%20dropbox.zip?dl=0" target="_blank" rel="external">workflow</a></p>
+
+      </div>
+      <footer>
+        
+        
+  
+  <div class="before-tags"><a></a></div>
+  <div class="tags">
+    <a href="/tags/dropbox/">dropbox</a>  <a href="/tags/automator/">automator</a>  <a href="/tags/applescript/">applescript</a>  <a href="/tags/workflow/">workflow</a>
+  </div>
+
+        
+        
+<section id="comment">
+  <!-- <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div> -->
+  <!-- 多说评论框 start -->
+  <div class="ds-thread" data-thread-key="2015-01-06-automator-workflow实现dropbox同步任意文件-夹/" data-title="automator workflow实现dropbox同步任意文件(夹)" data-url="http://sunhs.github.io/2015-01-06-automator-workflow实现dropbox同步任意文件-夹/"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"hyesun"};
+    (function() {
+                var ds = document.createElement('script');
+                ds.type = 'text/javascript';ds.async = true;
+                ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                ds.charset = 'UTF-8';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+     })();
+</script>
+<!-- 多说公共JS代码 end -->  
+</section>
+
+        <div class="clearfix"></div>
+      </footer>
+    
+    <!-- <footer>
+      
+        
+        
+  
+  <div class="before-tags"><a></a></div>
+  <div class="tags">
+    <a href="/tags/dropbox/">dropbox</a>  <a href="/tags/automator/">automator</a>  <a href="/tags/applescript/">applescript</a>  <a href="/tags/workflow/">workflow</a>
+  </div>
+
+        
+      
+      <div class="clearfix"></div>
+    </footer> -->
+  </div>
+</article></div></div>
+    <div class="clearfix"></div>
+  </div>
+
+  <div id="footer-wrapper">
+    <footer id="footer" class="inner">
+<div class="aligncenter">
+	<a href="https://github.com/cinvro/hexo-theme-perry">Perry</a> by <a href="http://cinvro.com">cinvro </a>
+</div>
+
+<div class="aligncenter">
+  
+  &copy; 2015 Edward Zhu
+  
+</div>
+
+<div class="clearfix"></div></footer>
+    <script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>
