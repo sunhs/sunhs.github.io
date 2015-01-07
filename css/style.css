@@ -83,7 +83,8 @@ a {
 }
 #main-col .post-content {
   margin: 0 auto;
-  width: 900px;
+  width: 700px;
+  border-bottom: 1px solid #e5e5e5;
 }
 @media screen and (max-width: 1024px) {
   #main-col .post-content {
@@ -186,7 +187,6 @@ a {
 }
 article {
   background: #fff;
-  border-bottom: 1px solid #e5e5e5;
 }
 article.page {
   padding-left: 20px;
