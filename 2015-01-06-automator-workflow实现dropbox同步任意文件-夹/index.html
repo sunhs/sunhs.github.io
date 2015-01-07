@@ -86,15 +86,15 @@
 
     <span class="comment">(* Your script goes here *)</span>
     <span class="keyword">tell</span> <span class="type">application</span> <span class="string">"Finder"</span>
-    <span class="keyword">set</span> dropBoxPath <span class="keyword">to</span> <span class="string">"/Users/edward/Dropbox"</span>
-    <span class="keyword">set</span> filelist <span class="keyword">to</span> input <span class="keyword">as</span> <span class="type">list</span>
-    <span class="keyword">set</span> curFile <span class="keyword">to</span> <span class="property">item</span> <span class="number">1</span> <span class="keyword">of</span> filelist
-    <span class="keyword">set</span> curFilePath <span class="keyword">to</span> <span class="property">POSIX path</span> <span class="keyword">of</span> curFile <span class="keyword">as</span> <span class="type">string</span>
-    <span class="keyword">repeat</span> <span class="keyword">while</span> curFilePath <span class="keyword">ends with</span> <span class="string">"/"</span>
-        <span class="keyword">set</span> curFilePath <span class="keyword">to</span> <span class="property">characters</span> <span class="number">1</span> <span class="keyword">thru</span> ((<span class="command">count</span> <span class="keyword">of</span> curFilePath) - <span class="number">1</span>) <span class="keyword">of</span> curFilePath <span class="keyword">as</span> <span class="type">string</span>
-    <span class="keyword">end</span> <span class="keyword">repeat</span>
-    <span class="keyword">set</span> curFilePath <span class="keyword">to</span> <span class="property">quoted form</span> <span class="keyword">of</span> curFilePath
-<span class="keyword">end</span> <span class="keyword">tell</span>
+        <span class="keyword">set</span> dropBoxPath <span class="keyword">to</span> <span class="string">"/Users/edward/Dropbox"</span>
+        <span class="keyword">set</span> filelist <span class="keyword">to</span> input <span class="keyword">as</span> <span class="type">list</span>
+        <span class="keyword">set</span> curFile <span class="keyword">to</span> <span class="property">item</span> <span class="number">1</span> <span class="keyword">of</span> filelist
+        <span class="keyword">set</span> curFilePath <span class="keyword">to</span> <span class="property">POSIX path</span> <span class="keyword">of</span> curFile <span class="keyword">as</span> <span class="type">string</span>
+        <span class="keyword">repeat</span> <span class="keyword">while</span> curFilePath <span class="keyword">ends with</span> <span class="string">"/"</span>
+            <span class="keyword">set</span> curFilePath <span class="keyword">to</span> <span class="property">characters</span> <span class="number">1</span> <span class="keyword">thru</span> ((<span class="command">count</span> <span class="keyword">of</span> curFilePath) - <span class="number">1</span>) <span class="keyword">of</span> curFilePath <span class="keyword">as</span> <span class="type">string</span>
+        <span class="keyword">end</span> <span class="keyword">repeat</span>
+        <span class="keyword">set</span> curFilePath <span class="keyword">to</span> <span class="property">quoted form</span> <span class="keyword">of</span> curFilePath
+    <span class="keyword">end</span> <span class="keyword">tell</span>
     <span class="comment">--display dialog curFilePath</span>
     <span class="command">do shell script</span> <span class="string">"ln -s "</span> &amp; curFilePath &amp; <span class="string">" "</span> &amp; dropBoxPath
 <span class="keyword">end</span> <span class="command">run</span>
