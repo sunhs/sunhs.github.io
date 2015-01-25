@@ -323,7 +323,7 @@ article .title a:hover {
   text-decoration: none;
 }
 article .entry {
-  margin-top: 80px;
+  margin-top: 30px;
   text-align: justify;
   line-height: 1.6;
 }
@@ -504,22 +504,6 @@ article footer a.more-link:before {
 article footer a.comment-link:before {
   content: '\f075';
 }
-article footer .categories,
-article footer .tags {
-  position: relative;
-  padding-left: 25px;
-  margin: 2px 0;
-}
-article footer .categories:before,
-article footer .tags:before {
-  position: absolute;
-  font: 1.1em FontAwesome;
-}
-article footer .categories:before {
-  content: '\f07b';
-  top: 2px;
-  left: 1px;
-}
 article footer .before-tags {
   max-width: 1px;
   margin: 0 auto 2em;
@@ -528,23 +512,6 @@ article footer .before-tags a:before {
   content: '\f02c';
   top: 2px;
   left: 1px;
-}
-article footer .tags {
-  max-width: 400px;
-  margin: 0 auto 2em;
-  text-align: center;
-}
-article footer .tags a {
-  display: inline-block;
-  padding: 0.2em 0.65em;
-  font-size: 1.2em;
-  -webkit-border-radius: 16px;
-  border-radius: 16px;
-  color: #ddd;
-}
-article footer .tags a:hover {
-  background: #f3f3f1;
-  color: #999;
 }
 article footer .addthis {
   max-width: 400px;
@@ -636,6 +603,39 @@ article footer .article-nav-title {
   font-size: 0.85em;
   line-height: line-height;
   margin-top: 0.5em;
+}
+.categories,
+.tags {
+  position: relative;
+  padding-left: 25px;
+  margin: 2px 0;
+}
+.categories:before,
+.tags:before {
+  position: absolute;
+  font: 1.1em FontAwesome;
+}
+.tags {
+  max-width: 400px;
+  margin: 0 auto 0.5em;
+  text-align: center;
+}
+.tags a {
+  display: inline-block;
+  padding: 0.2em 0.65em;
+  font-size: 1.2em;
+  -webkit-border-radius: 16px;
+  border-radius: 16px;
+  color: #ddd;
+}
+.tags a:hover {
+  background: #f3f3f1;
+  color: #999;
+}
+.categories:before {
+  content: '\f07b';
+  top: 2px;
+  left: 1px;
 }
 #Comment {
   padding: 20px;
