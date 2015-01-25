@@ -47,8 +47,8 @@
 </div></header>
   <div id="content" class="inner">
     <div id="main-col"><div id="wrapper"><article class="post">
-  
-    <div class="gallery">
+    
+        <div class="gallery">
   <div class="photoset">
     
       <img src="">
@@ -59,21 +59,21 @@
     <div class="next"></div>
   </div>
 </div>
-  
-  <div class="post-content">
-    <header>
-      
-        <time datetime="2014-12-25T05:57:56.000Z"><a href="/2014-12-25-Linux系统编程：执行外部程序/">2014-12-25</a></time>
-      
-      
+    
+    <div class="post-content">
+        <header>
+            
+                <time datetime="2014-12-25T05:57:56.000Z"><a href="/2014-12-25-Linux系统编程：执行外部程序/">2014-12-25</a></time>
+            
+            
   
     <h1 class="title">Linux系统编程：执行外部程序</h1>
   
 
-    </header>
-    
-      <div class="entry">
-        <p>Linux技术与实践这门课好久没去上了，而期末已然开始张牙舞抓，于是最近不得不开始预习。</p>
+        </header>
+        
+            <div class="entry">
+                <p>Linux技术与实践这门课好久没去上了，而期末已然开始张牙舞抓，于是最近不得不开始预习。</p>
 <p>昨夜睡前吃太饱，加之近来心事颇多，以及这不合常理的冬夜里的飞蚊侵扰，我最终没能安稳入睡，于是下床学习。打开老师的C语言源代码，看起来一半懂一半懵。关于fork和execvp这部分十分陌生，在各种博客上潜心学习之后，终于有所突破，在此做下记录。</p>
 <p>首先关于fork()的知识来自于<a href="http://blog.csdn.net/jason314/article/details/5640969" target="_blank" rel="external">jason的专栏</a>，关于执行外部程序的知识来自于<a href="http://qqtx.qq.com/g/0XY81A0YgWwy" target="_blank" rel="external">Jollen’s Blog</a>。</p>
 <p>fork函数通过系统调用创建一个与原进程几乎完全一样的子进程，并且父进程的值会被复制到子进程中。由于fork会把进程当前的情况拷贝一份，因此父进程中已经执行的部分不会在子进程中重复执行。</p>
@@ -176,19 +176,19 @@
 </code></pre><p>这里需要说明一下，程序开头的注释说明这是版本2，所谓的版本1其实就是在execute函数里直接调用execvp系统调用，这样做的坏处，之前就说过了。</p>
 <p>从main函数里我们看出这个程序的目的是不断地读取用户输入的外部命令并执行，因此父进程是绝对不能被系统调用取代的。</p>
 
-      </div>
-      <footer>
-        
-        
+            </div>
+            <footer>
+                
+                
   
-  <div class="before-tags"><a></a></div>
+  <!-- <div class="before-tags"><a></a></div> -->
   <div class="tags">
     <a href="/tags/C/">C</a>  <a href="/tags/Linux/">Linux</a>  <a href="/tags/编程/">编程</a>  <a href="/tags/fork/">fork</a>  <a href="/tags/execvp/">execvp</a>
   </div>
 
-        
-        
-          
+
+                
+                
 <nav id="article-nav">
   
     <a href="/2015-01-06-automator-workflow实现dropbox同步任意文件-夹/" id="article-nav-newer" class="article-nav-link-wrap">
@@ -208,12 +208,34 @@
   
 </nav>
 
+                
+<section id="comment">
+  <!-- <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div> -->
+  <!-- 多说评论框 start -->
+  <div class="ds-thread" data-thread-key="2014-12-25-Linux系统编程：执行外部程序/" data-title="Linux系统编程：执行外部程序" data-url="http://sunhs.github.io/2014-12-25-Linux系统编程：执行外部程序/"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"hyesun"};
+    (function() {
+                var ds = document.createElement('script');
+                ds.type = 'text/javascript';ds.async = true;
+                ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                ds.charset = 'UTF-8';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+     })();
+</script>
+<!-- 多说公共JS代码 end -->  
+</section>
+
+                <div class="clearfix"></div>
+            </footer>
         
-        <div class="clearfix"></div>
-      </footer>
-    
-  </div>
-</article></div></div>
+    </div>
+</article>
+</div></div>
     <div class="clearfix"></div>
   </div>
 

@@ -47,8 +47,8 @@
 </div></header>
   <div id="content" class="inner">
     <div id="main-col"><div id="wrapper"><article class="post">
-  
-    <div class="gallery">
+    
+        <div class="gallery">
   <div class="photoset">
     
       <img src="">
@@ -59,21 +59,21 @@
     <div class="next"></div>
   </div>
 </div>
-  
-  <div class="post-content">
-    <header>
-      
-        <time datetime="2015-01-06T05:45:06.000Z"><a href="/2015-01-06-automator-workflow实现dropbox同步任意文件-夹/">2015-01-06</a></time>
-      
-      
+    
+    <div class="post-content">
+        <header>
+            
+                <time datetime="2015-01-06T05:45:06.000Z"><a href="/2015-01-06-automator-workflow实现dropbox同步任意文件-夹/">2015-01-06</a></time>
+            
+            
   
     <h1 class="title">automator workflow实现dropbox同步任意文件(夹)</h1>
   
 
-    </header>
-    
-      <div class="entry">
-        <p>用坚果云有一段时间了，感觉还行。据说这是国内唯一足以媲美dropbox的网盘服务。但是这段时间下来，心里总有点不舒服。归根结底，是我对网盘没有一个明确的规划，导致里面的文件杂乱无章，每次整理都是满满的怨念。</p>
+        </header>
+        
+            <div class="entry">
+                <p>用坚果云有一段时间了，感觉还行。据说这是国内唯一足以媲美dropbox的网盘服务。但是这段时间下来，心里总有点不舒服。归根结底，是我对网盘没有一个明确的规划，导致里面的文件杂乱无章，每次整理都是满满的怨念。</p>
 <p>最近跟别人一起租服务器，与shadowsocks私奔到墙外。心里思量着，既然有了出墙的机会，何不趁此把赞誉满钵的dropbox收入麾下。想来坚果云虽好，但总归有种“备胎”的感觉（坚果云用户轻喷…），而且界面上dropbox要更胜一筹，应用支持也比较广泛，最后决定抛弃宝马，坐上玛莎拉蒂（之所以这样比喻，是因为我对汽车一无所知，但又从众地认为后者要优于前者；这正如我对网盘的理解）。</p>
 <p>但是一安装Mac版的dropbox，我就发现有点不对劲。如此知名的软件，在如此知名的平台上，竟然不具备其追赶者坚果云所拥有的同步任意文件夹的功能。如果要同步任何文件（夹），就不得不把整个文件拖进唯一的dropbox同步文件夹里。我有轻微的完美主义，这让我心里有点疙瘩；但是又不愿在好不容易做出选择之后又回归坚果云。我同学说，这就是“你爱用用，不用滚”的高冷气质。在他的推荐下，我装上macdropany。看了这玩意的官方介绍，原来dropbox在同步symbolic link的时候，实际上会同步原文件。这实在极其科学，因为我可以用shell脚本来创建软链接。</p>
 <p>那么问题来了，我该怎样触发这个shell脚本呢，同时，我要如何获得选取的文件（夹）的名字呢？</p>
@@ -107,19 +107,19 @@
 <p>Download me:</p>
 <p><a href="https://www.dropbox.com/s/0j7zvm9rlz2gil1/sync%20with%20dropbox.zip?dl=0" target="_blank" rel="external">workflow</a></p>
 
-      </div>
-      <footer>
-        
-        
+            </div>
+            <footer>
+                
+                
   
-  <div class="before-tags"><a></a></div>
+  <!-- <div class="before-tags"><a></a></div> -->
   <div class="tags">
     <a href="/tags/dropbox/">dropbox</a>  <a href="/tags/automator/">automator</a>  <a href="/tags/applescript/">applescript</a>  <a href="/tags/workflow/">workflow</a>
   </div>
 
-        
-        
-          
+
+                
+                
 <nav id="article-nav">
   
     <a href="/2015-01-12-shell-script词典/" id="article-nav-newer" class="article-nav-link-wrap">
@@ -139,12 +139,34 @@
   
 </nav>
 
+                
+<section id="comment">
+  <!-- <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div> -->
+  <!-- 多说评论框 start -->
+  <div class="ds-thread" data-thread-key="2015-01-06-automator-workflow实现dropbox同步任意文件-夹/" data-title="automator workflow实现dropbox同步任意文件(夹)" data-url="http://sunhs.github.io/2015-01-06-automator-workflow实现dropbox同步任意文件-夹/"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"hyesun"};
+    (function() {
+                var ds = document.createElement('script');
+                ds.type = 'text/javascript';ds.async = true;
+                ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                ds.charset = 'UTF-8';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+     })();
+</script>
+<!-- 多说公共JS代码 end -->  
+</section>
+
+                <div class="clearfix"></div>
+            </footer>
         
-        <div class="clearfix"></div>
-      </footer>
-    
-  </div>
-</article></div></div>
+    </div>
+</article>
+</div></div>
     <div class="clearfix"></div>
   </div>
 

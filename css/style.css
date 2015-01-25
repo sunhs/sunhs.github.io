@@ -508,7 +508,7 @@ article footer .categories,
 article footer .tags {
   position: relative;
   padding-left: 25px;
-  margin: 5px 0;
+  margin: 2px 0;
 }
 article footer .categories:before,
 article footer .tags:before {
@@ -531,7 +531,7 @@ article footer .before-tags a:before {
 }
 article footer .tags {
   max-width: 400px;
-  margin: 0 auto 5em;
+  margin: 0 auto 2em;
   text-align: center;
 }
 article footer .tags a {
@@ -558,6 +558,7 @@ article footer .addthis iframe {
 article footer #article-nav {
   zoom: 1;
   position: relative;
+  margin-bottom: 3em;
 }
 article footer #article-nav:before,
 article footer #article-nav:after {
@@ -636,12 +637,12 @@ article footer .article-nav-title {
   line-height: line-height;
   margin-top: 0.5em;
 }
-#comment {
+#Comment {
   padding: 20px;
   background: #fff;
   margin-bottom: 50px;
 }
-#comment .title {
+#Comment .title {
   font-weight: normal;
   margin-bottom: 15px;
 }
