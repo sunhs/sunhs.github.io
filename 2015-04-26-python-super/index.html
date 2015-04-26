@@ -1,0 +1,284 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>python super() 及 MRO | Sword and Poem</title>
+  <meta name="author" content="Edward Zhu">
+  
+  <meta name="description" content="Just for fun.">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="python super() 及 MRO"/>
+  <meta property="og:site_name" content="Sword and Poem"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  <link href="/favicon.png" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="Sword and Poem" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+  
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="group-text">
+	<nav id="main-nav">
+	  <ul>
+	    
+	      <li><a href="/">Home</a></li>
+	    
+	      <li><a href="/archives">Archives</a></li>
+	    
+	  </ul>
+	  <div class="clearfix"></div>
+	</nav>
+	<div class="main-header">
+	  <h1><a href="/">Sword and Poem</a></h1>
+	  <h2><a href="/"></a></h2>
+	</div>
+	<div class="clearfix"></div>
+</div></header>
+  <div id="content" class="inner">
+    <div id="main-col"><div id="wrapper"><article class="post">
+    
+        <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+    
+    <div class="post-content">
+        <header>
+            
+                <time datetime="2015-04-26T06:06:08.000Z"><a href="/2015-04-26-python-super/">2015-04-26</a></time>
+            
+            
+  
+    <h1 class="title">python super() 及 MRO</h1>
+  
+
+        </header>
+        
+            <div class="entry">
+                
+  
+  <!-- <div class="before-tags"><a></a></div> -->
+  <div class="tags">
+    <a href="/tags/python/">python</a>  <a href="/tags/note/">note</a>
+  </div>
+
+
+                <p>最近使用django的时候，常常看到代码里出现Mixin，在大致了解了Mixin的编程思想后，又掉入了另一个问题：python的super有什么作用，需要注意什么事情？</p>
+<p>写过一些安卓代码，所以自然而然地就觉得super是用来调用父类的函数，但是为什么在python上好像是很深奥的东西？</p>
+<p>让我们假设有这样的继承链：</p>
+<pre><code><span class="class"><span class="keyword">class</span> <span class="title">T</span><span class="params">(object)</span>:</span>
+    a = <span class="number">0</span>
+
+<span class="class"><span class="keyword">class</span> <span class="title">A</span><span class="params">(T)</span>:</span>
+    <span class="keyword">pass</span>
+
+<span class="class"><span class="keyword">class</span> <span class="title">B</span><span class="params">(T)</span>:</span>
+    a = <span class="number">2</span>
+
+<span class="class"><span class="keyword">class</span> <span class="title">C</span><span class="params">(A, B)</span>:</span>
+    <span class="keyword">pass</span>
+
+c = C()
+</code></pre><p>Michele Simionato的<a href="http://www.artima.com/weblogs/viewpost.jsp?thread=236275" target="_blank" rel="external">这篇文章</a>告诉我们：</p>
+<blockquote>
+<p>There are two direct superclasses (i.e. bases) of C: A and B. A comes before B, so one would naturally think that the superclass of C is A. However, A inherits its attribute a from T with value a=0: if super(C,c) was returning the superclass of C, then super(C,c).a would return 0. This is NOT what happens. Instead, super(C,c).a walks through the method resolution order of the class of c (i.e. C) and retrieves the attribute from the first class above C which defines it. In this example the MRO of C is [C, A, B, T, object], so B is the first class above C which defines a and super(C,c).a correctly returns the value 2, not 0</p>
+</blockquote>
+<p>这就是说，对于python的super方法，我们不能用常规的子类继承的方式来理解，而应该从MRO入手；并且对于请求的属性或者方法，super会返回在MRO中第一个被定义的相应属性或方法。</p>
+<p>让我们考虑第二个例子，这个例子来自于<a href="http://www.cnblogs.com/lovemo1314/archive/2011/05/03/2035005.html" target="_blank" rel="external">“漩涡鸣人”的文章</a>：</p>
+<pre><code><span class="class"><span class="keyword">class</span> <span class="title">A</span><span class="params">(object)</span>:</span>
+    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span>
+        <span class="keyword">print</span> <span class="string">"enter A"</span>
+        <span class="keyword">print</span> <span class="string">"leave A"</span>
+
+<span class="class"><span class="keyword">class</span> <span class="title">B</span><span class="params">(object)</span>:</span>
+    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span>
+        <span class="keyword">print</span> <span class="string">"enter B"</span>
+        <span class="keyword">print</span> <span class="string">"leave B"</span>
+
+<span class="class"><span class="keyword">class</span> <span class="title">C</span><span class="params">(A)</span>:</span>
+    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span>
+        <span class="keyword">print</span> <span class="string">"enter C"</span>
+        super(C, self).__init__()
+        <span class="keyword">print</span> <span class="string">"leave C"</span>
+
+<span class="class"><span class="keyword">class</span> <span class="title">D</span><span class="params">(A)</span>:</span>
+    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span>
+        <span class="keyword">print</span> <span class="string">"enter D"</span>
+        super(D, self).__init__()
+        <span class="keyword">print</span> <span class="string">"leave D"</span>
+
+<span class="class"><span class="keyword">class</span> <span class="title">E</span><span class="params">(B, C)</span>:</span>
+    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span>
+        <span class="keyword">print</span> <span class="string">"enter E"</span>
+        B.__init__(self)            
+        C.__init__(self)
+        <span class="keyword">print</span> <span class="string">"leave E"</span>
+
+<span class="class"><span class="keyword">class</span> <span class="title">F</span><span class="params">(E, D)</span>:</span>
+    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span>
+        <span class="keyword">print</span> <span class="string">"enter F"</span>
+        E.__init__(self)
+        D.__init__(self)
+        <span class="keyword">print</span> <span class="string">"leave F"</span>
+
+f = F()
+</code></pre><p>此时我们得到的结果是：</p>
+<pre><code><span class="keyword">enter</span> F
+<span class="keyword">enter</span> E
+<span class="keyword">enter</span> B
+<span class="keyword">leave</span> B
+<span class="keyword">enter</span> C
+<span class="keyword">enter</span> D
+<span class="keyword">enter</span> A
+<span class="keyword">leave</span> A
+<span class="keyword">leave</span> D
+<span class="keyword">leave</span> C
+<span class="keyword">leave</span> E
+<span class="keyword">enter</span> D
+<span class="keyword">enter</span> A
+<span class="keyword">leave</span> A
+<span class="keyword">leave</span> D
+<span class="keyword">leave</span> F
+</code></pre><p>我们来看看继承的图像：</p>
+<pre><code>object    
+<span class="string">|    \   </span>
+<span class="string">|     A   </span>
+<span class="string">|   / |</span>
+B  C  D
+ \ /  <span class="string">|</span>
+   E  <span class="string">|</span>
+    \ <span class="string">|</span>
+      F
+</code></pre><p>这里MRO的顺序是 F E B C D A object，所以C中的<code>super(C, self).__init__()</code>调用的会是D的<code>__init__()</code>函数（也就是MRO中下一个首先定义了该函数的类），而不是我们所可能认为的C的“父类”A。值得注意的是，假如我们把<code>f = F()</code>替换成<code>c = C()</code>，那么MRO会变成C A object，此时C中的<code>super(C, self).__init__()</code>调用的会是A的<code>__init__()</code>函数。</p>
+<p>接下来我们需要搞清楚，MRO是怎么得出来的。</p>
+<p>通过 <a href="https://www.python.org/download/releases/2.3/mro/" target="_blank" rel="external">The Python 2.3 Method Resolution Order</a> 可以看到，新式类的MRO是通过C3算法来求得的（假如我对python历史的了解是正确的的话）。</p>
+<p>对于类C，C的 <em>linearization</em> 是这样一个列表：它包含了C以及C的所有祖先，按照从近到远的顺序排列。它的计算是这样的递归方式：</p>
+<blockquote>
+<p>C的 linearization 是C加上其父类的 linearization 及父类列表的合并</p>
+</blockquote>
+<pre><code>L[<span class="keyword">C</span>(B1...BN)] = <span class="keyword">C</span> + merge(L[B1]...L[BN], B1...BN)
+</code></pre><p>其中</p>
+<pre><code>L[<span class="keyword">object</span>] = <span class="keyword">object</span>
+</code></pre><p>我们约定，列表 C1C2C3…CN 的头是 C1，尾是 C2C3…CN。</p>
+<p>我们用这样的方式来计算递归式里的 <em>merge</em> 。</p>
+<p>取第一个列表的头，即L[B1][0]，如果这个头不在其他任何列表里的尾，则它是个 <em>“好头”</em>，可以加入C的 linearization 列表并从 merge 中移除，然后重复上述操作。否则，继续搜索下一个列表。如果找不到这样的好头，则构造MRO失败。</p>
+<p>举个例子，有下面的类继承结构：</p>
+<pre><code>O = object
+<span class="class"><span class="keyword">class</span> <span class="title">F</span><span class="params">(O)</span>:</span> <span class="keyword">pass</span>
+<span class="class"><span class="keyword">class</span> <span class="title">E</span><span class="params">(O)</span>:</span> <span class="keyword">pass</span>
+<span class="class"><span class="keyword">class</span> <span class="title">D</span><span class="params">(O)</span>:</span> <span class="keyword">pass</span>
+<span class="class"><span class="keyword">class</span> <span class="title">C</span><span class="params">(D, F)</span>:</span> <span class="keyword">pass</span>
+<span class="class"><span class="keyword">class</span> <span class="title">B</span><span class="params">(D, E)</span>:</span> <span class="keyword">pass</span>
+<span class="class"><span class="keyword">class</span> <span class="title">A</span><span class="params">(B, C)</span>:</span> <span class="keyword">pass</span>
+</code></pre><p>则构建如下：</p>
+<pre><code>L[<span class="keyword">O</span>] = <span class="keyword">O</span>
+L[<span class="keyword">D</span>] = <span class="keyword">D</span> <span class="keyword">O</span>
+L[<span class="keyword">E</span>] = <span class="keyword">E</span> <span class="keyword">O</span>
+L[F] = F <span class="keyword">O</span>
+
+L[B] = B + merge(L[<span class="keyword">D</span>]L[<span class="keyword">E</span>], DE)
+     = B + merge(DO, EO, DE)
+</code></pre><p>我们看到对于第一个列表 DO，它的头 D 不在其他列表的尾里，是个好头，我们把它取出来，则</p>
+<pre><code>L[B] = BD + merge(<span class="keyword">O</span>, EO, <span class="keyword">E</span>)
+</code></pre><p>此时第一个列表 O 的头在第二个列表 EO 的尾里，不是个好头，继续搜索列表 EO ，它的头 E 是个好头，于是</p>
+<pre><code>L[B] = BDE + merge(O)
+     =<span class="ruby"> <span class="constant">BDE</span> + <span class="constant">O</span>
+</span>     =<span class="ruby"> <span class="constant">BDEO</span></span>
+</code></pre><p>同理</p>
+<pre><code>L[<span class="keyword">C</span>] = <span class="keyword">C</span> + merge(DO, FO, DF)
+     = <span class="keyword">C</span> + <span class="keyword">D</span> + merge(<span class="keyword">O</span>, FO, F)
+     = <span class="keyword">C</span> + <span class="keyword">D</span> + F + merge(<span class="keyword">O</span>, <span class="keyword">O</span>)
+     = CDFO
+</code></pre><p>因此</p>
+<pre><code>L[A] = A + merge(BDEO, CDFO, BC)
+     =<span class="ruby"> <span class="constant">A</span> + <span class="constant">B</span> + merge(<span class="constant">DEO</span>, <span class="constant">CDFO</span>, <span class="constant">C</span>)
+</span>     =<span class="ruby"> <span class="constant">A</span> + <span class="constant">B</span> + <span class="constant">C</span> + merge(<span class="constant">DEO</span>, <span class="constant">DFO</span>)
+</span>     =<span class="ruby"> <span class="constant">A</span> + <span class="constant">B</span> + <span class="constant">C</span> + <span class="constant">D</span> + merge(<span class="constant">EO</span>, <span class="constant">FO</span>)
+</span>     =<span class="ruby"> <span class="constant">A</span> + <span class="constant">B</span> + <span class="constant">C</span> + <span class="constant">D</span> + <span class="constant">E</span> + merge(<span class="constant">O</span>, <span class="constant">FO</span>)
+</span>     =<span class="ruby"> <span class="constant">ABCDEFO</span></span>
+</code></pre><p>以上。</p>
+
+            </div>
+            <footer>
+                
+<nav id="article-nav">
+  
+  
+    <a href="/2015-03-17-walk-away/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">next</strong>
+      <div class="article-nav-title">walk away</div>
+    </a>
+  
+</nav>
+
+                
+<section id="comment">
+  <!-- <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div> -->
+  <!-- 多说评论框 start -->
+  <div class="ds-thread" data-thread-key="2015-04-26-python-super/" data-title="python super() 及 MRO" data-url="http://sunhs.github.io/2015-04-26-python-super/"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"hyesun"};
+    (function() {
+                var ds = document.createElement('script');
+                ds.type = 'text/javascript';ds.async = true;
+                ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                ds.charset = 'UTF-8';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+     })();
+</script>
+<!-- 多说公共JS代码 end -->  
+</section>
+
+                <div class="clearfix"></div>
+            </footer>
+        
+    </div>
+</article>
+</div></div>
+    <div class="clearfix"></div>
+  </div>
+
+  <div id="footer-wrapper">
+    <footer id="footer" class="inner">
+<div class="aligncenter">
+	<a href="https://github.com/cinvro/hexo-theme-perry">Perry</a> by <a href="http://cinvro.com">cinvro </a>
+</div>
+
+<div class="aligncenter">
+  
+  &copy; 2015 Edward Zhu
+  
+</div>
+
+<div class="clearfix"></div></footer>
+    <script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>
