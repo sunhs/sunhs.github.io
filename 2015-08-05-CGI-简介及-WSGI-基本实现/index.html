@@ -1,0 +1,194 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>CGI 简介及 WSGI 基本实现 | Sword and Poem</title>
+  <meta name="author" content="Edward Zhu">
+  
+  <meta name="description" content="Just for fun.">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="CGI 简介及 WSGI 基本实现"/>
+  <meta property="og:site_name" content="Sword and Poem"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  <link href="/favicon.png" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="Sword and Poem" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+  
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="group-text">
+	<nav id="main-nav">
+	  <ul>
+	    
+	      <li><a href="/">Home</a></li>
+	    
+	      <li><a href="/archives">Archives</a></li>
+	    
+	  </ul>
+	  <div class="clearfix"></div>
+	</nav>
+	<div class="main-header">
+	  <h1><a href="/">Sword and Poem</a></h1>
+	  <h2><a href="/"></a></h2>
+	</div>
+	<div class="clearfix"></div>
+</div></header>
+  <div id="content" class="inner">
+    <div id="main-col"><div id="wrapper"><article class="post">
+    
+        <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+    
+    <div class="post-content">
+        <header>
+            
+                <time datetime="2015-08-05T07:15:42.000Z"><a href="/2015-08-05-CGI-简介及-WSGI-基本实现/">2015-08-05</a></time>
+            
+            
+  
+    <h1 class="title">CGI 简介及 WSGI 基本实现</h1>
+  
+
+        </header>
+        
+            <div class="entry">
+                
+  
+  <!-- <div class="before-tags"><a></a></div> -->
+  <div class="tags">
+    <a href="/tags/CGI/">CGI</a>  <a href="/tags/WSGI/">WSGI</a>  <a href="/tags/web/">web</a>  <a href="/tags/编程/">编程</a>
+  </div>
+
+
+                <h2 id="CGI">CGI</h2>
+<p>通用网关接口(common gateway interface, 简称 CGI)，是 Web 服务器与外部程序(CGI 程序)进行数据交互的接口标准。它类似于服务器与应用程序之间的一个约定，使得彼此了解自己应该怎样调用对方的接口，以及应该为对方提供什么样的数据。</p>
+<p>下面是摘自<a href="http://www.cnblogs.com/liuzhang/p/3929198.html" target="_blank" rel="external">掸尘的文章</a>的一段话。</p>
+<blockquote>
+<p>WEB服务器将根据 CGI 程序的类型决定数据向 CGI 程序的传送方式，一般来讲是通过标准输入/输出流和环境变量来与 CGI 程序间传递数据。 如下图所示：</p>
+</blockquote>
+<p><img src="https://raw.githubusercontent.com/sunhs/sunhs.github.io/master/img/CGI_process.gif" alt="CGI_process"></p>
+<blockquote>
+<p>CGI 程序通过标准输入（STDIN）和标准输出（STDOUT）来进行输入输出。此外 CGI 程序还通过环境变量来得到输入，操作系统提供了许多环境变量，它们定义了程序的执行环境，应用程序可以存取它们。Web 服务器和 CGI 接口又另外设置了一些环境变量，用来向 CGI 程序传递一些重要的参数。CGI 的 GET 方法还通过环境变量 QUERY-STRING 向 CGI 程序传递 Form 中的数据。下面是一些常用的CGI环境变量：</p>
+</blockquote>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">CONTENT_TYPE	  这个环境变量的值指示所传递来的信息的MIME类型。目前，环境变量CONTENT_TYPE一般都是：application/x-www-form-urlencoded,他表示数据来自于HTML表单。</div><div class="line">CONTENT_LENGTH	  如果服务器与CGI程序信息的传递方式是POST，这个环境变量即使从标准输入STDIN中可以读到的有效数据的字节数。这个环境变量在读取所输入的数据时必须使用。</div><div class="line">HTTP_COOKIE	      客户机内的 COOKIE 内容。</div><div class="line">HTTP_USER_AGENT	  提供包含了版本数或其他专有数据的客户浏览器信息。</div><div class="line">PATH_INFO	      这个环境变量的值表示紧接在CGI程序名之后的其他路径信息。它常常作为CGI程序的参数出现。</div><div class="line">QUERY_STRING	  如果服务器与CGI程序信息的传递方式是<span class="keyword">GET</span>，这个环境变量的值即使所传递的信息。这个信息经跟在CGI程序名的后面，两者中间用一个问号<span class="comment">'?'分隔。</span></div><div class="line">REMOTE_ADDR	      这个环境变量的值是发送请求的客户机的IP地址，例如上面的<span class="number">192.168</span><span class="number">.1</span><span class="number">.67</span>。这个值总是存在的。而且它是Web客户机需要提供给Web服务器的唯一标识，可以在CGI程序中用它来区分不同的Web客户机。</div><div class="line">REMOTE_HOST	      这个环境变量的值包含发送CGI请求的客户机的主机名。如果不支持你想查询，则无需定义此环境变量。</div><div class="line">REQUEST_METHOD	  提供脚本被调用的方法。对于使用 HTTP/<span class="number">1.0</span> 协议的脚本，仅 <span class="keyword">GET</span> 和 POST 有意义。</div><div class="line">SCRIPT_FILENAME	  CGI脚本的完整路径</div><div class="line">SCRIPT_NAME	      CGI脚本的的名称</div><div class="line">SERVER_NAME	      这是你的 WEB 服务器的主机名、别名或IP地址。</div><div class="line">SERVER_SOFTWARE	  这个环境变量的值包含了调用CGI程序的HTTP服务器的名称和版本号。例如，上面的值为Apache/<span class="number">2.2</span><span class="number">.14</span>(Unix)</div></pre></td></tr></table></figure>
+
+<h2 id="WSGI">WSGI</h2>
+<p>WSGI，简单地说，可以理解为 Python 的 CGI 接口，定义于<a href="http://legacy.python.org/dev/peps/pep-0333/" target="_blank" rel="external">PEP0333</a>。</p>
+<p>WSGI 规定每个 application (即 CGI 程序)必须为可调用的对象（可以是函数或者实现了实现了 <strong>call</strong> 方法的类），接受两个参数：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="attribute">environ</span>: <span class="string">       Web 服务器提供的 WSGI 的环境变量</span></div><div class="line"><span class="attribute">start_response</span>: <span class="string">Web 服务器提供的响应请求的方法</span></div></pre></td></tr></table></figure>
+
+<p>其中，</p>
+<ul>
+<li>start_response 接受两个位置参数：status 和 response_headers。</li>
+<li>application 在返回响应体之前，要先调用 start_response，来写 Web 服务器的响应头。</li>
+<li>application 返回的必须是一个可迭代对象，对象的元素即是响应体。例如响应体是 “hello world!”，则返回的为 [“hello world!”]。</li>
+</ul>
+<p>PEP0333 提供了几个简单的例子。首先是 Web 服务器端的代码。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> os, sys</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">run_with_cgi</span><span class="params">(application)</span>:</span></div><div class="line"></div><div class="line">    environ = dict(os.environ.items())</div><div class="line">    environ[<span class="string">'wsgi.input'</span>]        = sys.stdin</div><div class="line">    environ[<span class="string">'wsgi.errors'</span>]       = sys.stderr</div><div class="line">    environ[<span class="string">'wsgi.version'</span>]      = (<span class="number">1</span>, <span class="number">0</span>)</div><div class="line">    environ[<span class="string">'wsgi.multithread'</span>]  = <span class="keyword">False</span></div><div class="line">    environ[<span class="string">'wsgi.multiprocess'</span>] = <span class="keyword">True</span></div><div class="line">    environ[<span class="string">'wsgi.run_once'</span>]     = <span class="keyword">True</span></div><div class="line"></div><div class="line">    <span class="keyword">if</span> environ.get(<span class="string">'HTTPS'</span>, <span class="string">'off'</span>) <span class="keyword">in</span> (<span class="string">'on'</span>, <span class="string">'1'</span>):</div><div class="line">        environ[<span class="string">'wsgi.url_scheme'</span>] = <span class="string">'https'</span></div><div class="line">    <span class="keyword">else</span>:</div><div class="line">        environ[<span class="string">'wsgi.url_scheme'</span>] = <span class="string">'http'</span></div><div class="line"></div><div class="line">    headers_set = []</div><div class="line">    headers_sent = []</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">write</span><span class="params">(data)</span>:</span></div><div class="line">        <span class="keyword">if</span> <span class="keyword">not</span> headers_set:</div><div class="line">             <span class="keyword">raise</span> AssertionError(<span class="string">"write() before start_response()"</span>)</div><div class="line"></div><div class="line">        <span class="keyword">elif</span> <span class="keyword">not</span> headers_sent:</div><div class="line">             <span class="comment"># Before the first output, send the stored headers</span></div><div class="line">             status, response_headers = headers_sent[:] = headers_set</div><div class="line">             sys.stdout.write(<span class="string">'Status: %s\r\n'</span> % status)</div><div class="line">             <span class="keyword">for</span> header <span class="keyword">in</span> response_headers:</div><div class="line">                 sys.stdout.write(<span class="string">'%s: %s\r\n'</span> % header)</div><div class="line">             sys.stdout.write(<span class="string">'\r\n'</span>)</div><div class="line"></div><div class="line">        sys.stdout.write(data)</div><div class="line">        sys.stdout.flush()</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start_response</span><span class="params">(status, response_headers, exc_info=None)</span>:</span></div><div class="line">        <span class="keyword">if</span> exc_info:</div><div class="line">            <span class="keyword">try</span>:</div><div class="line">                <span class="keyword">if</span> headers_sent:</div><div class="line">                    <span class="comment"># Re-raise original exception if headers sent</span></div><div class="line">                    <span class="keyword">raise</span> exc_info[<span class="number">0</span>], exc_info[<span class="number">1</span>], exc_info[<span class="number">2</span>]</div><div class="line">            <span class="keyword">finally</span>:</div><div class="line">                exc_info = <span class="keyword">None</span>     <span class="comment"># avoid dangling circular ref</span></div><div class="line">        <span class="keyword">elif</span> headers_set:</div><div class="line">            <span class="keyword">raise</span> AssertionError(<span class="string">"Headers already set!"</span>)</div><div class="line"></div><div class="line">        headers_set[:] = [status, response_headers]</div><div class="line">        <span class="keyword">return</span> write</div><div class="line"></div><div class="line">    result = application(environ, start_response)</div><div class="line"></div><div class="line">    <span class="keyword">try</span>:</div><div class="line">        <span class="keyword">for</span> data <span class="keyword">in</span> result:</div><div class="line">            <span class="keyword">if</span> data:    <span class="comment"># don't send headers until body appears</span></div><div class="line">                write(data)</div><div class="line">        <span class="keyword">if</span> <span class="keyword">not</span> headers_sent:</div><div class="line">            write(<span class="string">''</span>)   <span class="comment"># send headers now if body was empty</span></div><div class="line">    <span class="keyword">finally</span>:</div><div class="line">        <span class="keyword">if</span> hasattr(result, <span class="string">'close'</span>):</div><div class="line">            result.close()</div></pre></td></tr></table></figure>
+
+<p>可以看到这段代码做这么几件事：</p>
+<ul>
+<li>准备环境变量</li>
+<li>定义 start_response 方法，用来写响应头</li>
+<li>调用 application，得到响应体</li>
+<li>用 write 方法写响应</li>
+</ul>
+<p>在 start_response 中，返回值是 write 方法。根据 PEP0333 的说法，有些旧的 application 没法返回 iterable 的结果，所以只能为它提供 write 方法，直接写响应，以保证兼容性。但是新的应用是不允许这样的做法的。</p>
+<p>接着是应用端的代码。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">simple_app</span><span class="params">(environ, start_response)</span>:</span></div><div class="line">    status = <span class="string">'200 OK'</span></div><div class="line">    response_headers = [(<span class="string">'Content-type'</span>, <span class="string">'text/plain'</span>)]</div><div class="line">    start_response(status, response_headers)</div><div class="line">    <span class="keyword">return</span> [<span class="string">'Hello world!\n'</span>]</div></pre></td></tr></table></figure>
+
+<p>应用端所做的事情，前面已经讲过了。如果需要了解更多详情，请阅读<a href="http://legacy.python.org/dev/peps/pep-0333/" target="_blank" rel="external">PEP0333</a>。</p>
+<p>根据 WSGI 的定义，以及<a href="http://cizixs.com/2014/11/09/dive-into-wsgiref/" target="_blank" rel="external">这篇文章</a>对 wsgiref 这个 lib 的讲解，我手动实现了一下 WSGI 协议（虽然大部分是<del>抄袭</del>参考 wsgiref 的）。</p>
+<p>大体而言，代码分为 server, request_handler, server_handler 三大块。</p>
+<p>当一个请求被 server 捕获时，server 设置好 CGI 定义的环境变量，绑定一个 app，然后交给 request_handler 处理。</p>
+<p>request_handler 进一步处理请求，完善环境变量，定义stdin/stdout/stderr 等，然后丢给 server_handler 处理。</p>
+<p>server_handler 的功能就像前面长篇大论讲到的 Web 服务器那样，组装 WSGI 定义的环境变量，定义 start_response 方法，调用 application，并写响应。</p>
+<p><a href="https://github.com/sunhs/my-wsgi" target="_blank" rel="external">代码在此。</a></p>
+
+            </div>
+            <footer>
+                
+<nav id="article-nav">
+  
+  
+    <a href="/2015-04-26-python-super/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">next</strong>
+      <div class="article-nav-title">python super() 及 MRO</div>
+    </a>
+  
+</nav>
+
+                
+<section id="comment">
+  <!-- <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div> -->
+  <!-- 多说评论框 start -->
+  <div class="ds-thread" data-thread-key="2015-08-05-CGI-简介及-WSGI-基本实现/" data-title="CGI 简介及 WSGI 基本实现" data-url="http://sunhs.github.io/2015-08-05-CGI-简介及-WSGI-基本实现/"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"hyesun"};
+    (function() {
+                var ds = document.createElement('script');
+                ds.type = 'text/javascript';ds.async = true;
+                ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                ds.charset = 'UTF-8';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+     })();
+</script>
+<!-- 多说公共JS代码 end -->  
+</section>
+
+                <div class="clearfix"></div>
+            </footer>
+        
+    </div>
+</article>
+</div></div>
+    <div class="clearfix"></div>
+  </div>
+
+  <div id="footer-wrapper">
+    <footer id="footer" class="inner">
+<div class="aligncenter">
+	<a href="https://github.com/cinvro/hexo-theme-perry">Perry</a> by <a href="http://cinvro.com">cinvro </a>
+</div>
+
+<div class="aligncenter">
+  
+  &copy; 2015 Edward Zhu
+  
+</div>
+
+<div class="clearfix"></div></footer>
+    <script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>
