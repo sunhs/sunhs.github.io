@@ -1,0 +1,170 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>非递归二叉树遍历 | Sword and Poem</title>
+  <meta name="author" content="Edward Zhu">
+  
+  <meta name="description" content="Just for fun.">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="非递归二叉树遍历"/>
+  <meta property="og:site_name" content="Sword and Poem"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  <link href="/favicon.png" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="Sword and Poem" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+  
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="group-text">
+	<nav id="main-nav">
+	  <ul>
+	    
+	      <li><a href="/">Home</a></li>
+	    
+	      <li><a href="/archives">Archives</a></li>
+	    
+	  </ul>
+	  <div class="clearfix"></div>
+	</nav>
+	<div class="main-header">
+	  <h1><a href="/">Sword and Poem</a></h1>
+	  <h2><a href="/"></a></h2>
+	</div>
+	<div class="clearfix"></div>
+</div></header>
+  <div id="content" class="inner">
+    <div id="main-col"><div id="wrapper"><article class="post">
+    
+        <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+    
+    <div class="post-content">
+        <header>
+            
+                <time datetime="2015-10-14T14:25:03.000Z"><a href="/2015-10-14-非递归二叉树遍历/">2015-10-14</a></time>
+            
+            
+  
+    <h1 class="title">非递归二叉树遍历</h1>
+  
+
+        </header>
+        
+            <div class="entry">
+                
+  
+  <!-- <div class="before-tags"><a></a></div> -->
+  <div class="tags">
+    <a href="/tags/编程/">编程</a>  <a href="/tags/二叉树/">二叉树</a>  <a href="/tags/遍历/">遍历</a>
+  </div>
+
+
+                <p>二叉树的遍历常用的是递归做法，简单明了。但是作为锻炼，其非递归做法也是需要掌握的。</p>
+<p>非递归做法的基本思路就是用栈模拟递归。在 leetcode 上自己写了一种解法，又参考别人的做法，感受不同的思路。作为强迫症，还是将其记录以作备忘之用。下面用先序遍历作为例子。</p>
+<p>做法一：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">  <span class="stl_container"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;</span> preorderTraversal(TreeNode* root) {</div><div class="line"><span class="stl_container"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;</span> res;</div><div class="line"><span class="keyword">if</span> (!root)</div><div class="line">    <span class="keyword">return</span> res;</div><div class="line">    </div><div class="line"><span class="stl_container"><span class="built_in">stack</span>&lt;TreeNode*&gt;</span> nodes;</div><div class="line"><span class="keyword">bool</span> leftVisited = <span class="keyword">false</span>;</div><div class="line"><span class="keyword">while</span> (<span class="keyword">true</span>) {</div><div class="line">	<span class="keyword">if</span> (!leftVisited)</div><div class="line">		res.push_back(root-&gt;val);</div><div class="line"></div><div class="line">	<span class="keyword">if</span> (root-&gt;left && !leftVisited) {</div><div class="line">		nodes.push(root);</div><div class="line">		root = root-&gt;left;</div><div class="line">		leftVisited = <span class="keyword">false</span>;</div><div class="line">		<span class="keyword">continue</span>;</div><div class="line">	}</div><div class="line"></div><div class="line">	<span class="keyword">if</span> (root-&gt;right) {</div><div class="line">		root = root-&gt;right;</div><div class="line">		leftVisited = <span class="keyword">false</span>;</div><div class="line">		<span class="keyword">continue</span>;</div><div class="line">	}</div><div class="line"></div><div class="line">	<span class="keyword">if</span> (nodes.empty())</div><div class="line">		<span class="keyword">break</span>;</div><div class="line">	root = nodes.top();</div><div class="line">	nodes.pop();</div><div class="line">	leftVisited = <span class="keyword">true</span>;</div><div class="line">}</div><div class="line"><span class="keyword">return</span> res;</div><div class="line">  }</div></pre></td></tr></table></figure>
+
+<p>这种做法几乎可以说是原原本本地照着递归做法模拟出来的。一旦当前结点处理完毕，则把父结点出栈并把控制权返还给它。</p>
+<p>这种做法先把当前结点的值输出；然后如果尚未访问左儿子，则自己入栈，把控制权交给左儿子，并进入下一个循环（递归）。如果没有左儿子或者左儿子已经访问，则把控制权交给右儿子并进入下一个循环（递归），此时自身无需入栈，因为已经没用了。否则，当前递归自然结束，把父结点出栈并返还控制权，进入下一个循环（递归）。</p>
+<p>做法二：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="stl_container"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;</span> preorderTraversal(TreeNode* root) {</div><div class="line">    <span class="stl_container"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;</span> v;</div><div class="line">    <span class="keyword">if</span>(!root) <span class="keyword">return</span> v;</div><div class="line">    TreeNode* cur = root;</div><div class="line">    <span class="stl_container"><span class="built_in">stack</span>&lt;TreeNode*&gt;</span> s;</div><div class="line">    <span class="keyword">while</span>(<span class="keyword">true</span>){</div><div class="line">        <span class="keyword">while</span>(cur){</div><div class="line">            v.push_back(cur-&gt;val);</div><div class="line">            s.push(cur);</div><div class="line">            cur = cur-&gt;left;</div><div class="line">        }</div><div class="line">        <span class="keyword">if</span>(s.empty()) <span class="keyword">break</span>;</div><div class="line">        cur = s.top();</div><div class="line">        s.pop();</div><div class="line">     cur = cur-&gt;right;</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>这种做法简洁一些。它也是存储父结点。不同于做法一的递归自然结束，它设置了递归的结束条件——即当当前结点为 null 时，将控制权返还给父结点。</p>
+<p>首先输出当前结点并入栈，把控制权交给左儿子。直到左儿子为 null，结束当前递归，把控制权返还给父结点，并让父结点去处理右儿子。直到右儿子为 null，返还控制权。</p>
+<p>做法三：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="stl_container"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;</span> preorderTraversal(TreeNode* root) {</div><div class="line">    <span class="stl_container"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;</span> v;</div><div class="line">    <span class="keyword">if</span>(!root) <span class="keyword">return</span> v;</div><div class="line">    TreeNode* temp = root;</div><div class="line">    <span class="stl_container"><span class="built_in">stack</span>&lt;TreeNode*&gt;</span> s;</div><div class="line">    <span class="keyword">while</span>(<span class="keyword">true</span>){</div><div class="line">        <span class="keyword">while</span>(temp){</div><div class="line">            v.push_back(temp-&gt;val);</div><div class="line">            <span class="keyword">if</span>(temp-&gt;right) s.push(temp-&gt;right);</div><div class="line">            temp = temp-&gt;left;</div><div class="line">        }</div><div class="line">        <span class="keyword">if</span>(s.empty()) <span class="keyword">break</span>;</div><div class="line">        temp = s.top();</div><div class="line">        s.pop();</div><div class="line">    };</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>这种跟做法二大同小异。同在都设置了递归结束条件：当前结点为 null。不同点在于，做法二中把控制权交给左儿子之前自身入栈，而做法三中是右儿子入栈。这是可以理解的，因为在做法二中，处理完左儿子之后控制权会返还给父结点，父结点紧接着去处理右儿子；那么何必保存父结点，再通过父结点去访问右儿子呢？直接保存右儿子就可以了。</p>
+<p>这是做法二的中序遍历：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="built_in">List</span><span class="subst">&lt;</span><span class="built_in">Integer</span><span class="subst">&gt;</span> inorderTraversal(TreeNode root) {</div><div class="line">    <span class="built_in">Stack</span><span class="subst">&lt;</span>TreeNode<span class="subst">&gt;</span> <span class="built_in">stack</span> <span class="subst">=</span> <span class="literal">new</span> <span class="built_in">Stack</span><span class="subst">&lt;&gt;</span>();</div><div class="line">    TreeNode cur <span class="subst">=</span> root;</div><div class="line">    <span class="keyword">while</span> (<span class="subst">!</span><span class="built_in">stack</span><span class="built_in">.</span>isEmpty() <span class="subst">||</span> cur <span class="subst">!=</span> <span class="built_in">null</span>) {</div><div class="line">        <span class="keyword">while</span> (cur <span class="subst">!=</span> <span class="built_in">null</span>) {</div><div class="line">            <span class="built_in">stack</span><span class="built_in">.</span>push(cur);</div><div class="line">            cur <span class="subst">=</span> cur<span class="built_in">.</span>left;</div><div class="line">        }</div><div class="line">        cur <span class="subst">=</span> <span class="built_in">stack</span><span class="built_in">.</span>pop();</div><div class="line">        ans<span class="built_in">.</span>add(cur<span class="built_in">.</span>val);</div><div class="line">        cur <span class="subst">=</span> cur<span class="built_in">.</span>right;</div><div class="line">    }</div><div class="line">    <span class="keyword">return</span> ans;</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>这些做法其实只是在细节上有所不同。比如递归的结束方式，控制权的转移顺序。不同的细节处理还可以延伸出各种做法，比如著名的 O(1) 空间复杂度的 Morris Traversal。</p>
+
+            </div>
+            <footer>
+                
+<nav id="article-nav">
+  
+  
+    <a href="/2015-08-16-生命的意义（摘自知乎）/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">next</strong>
+      <div class="article-nav-title">生命的意义（转自知乎）</div>
+    </a>
+  
+</nav>
+
+                
+<section id="comment">
+  <!-- <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div> -->
+  <!-- 多说评论框 start -->
+  <div class="ds-thread" data-thread-key="2015-10-14-非递归二叉树遍历/" data-title="非递归二叉树遍历" data-url="http://sunhs.github.io/2015-10-14-非递归二叉树遍历/"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"hyesun"};
+    (function() {
+                var ds = document.createElement('script');
+                ds.type = 'text/javascript';ds.async = true;
+                ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                ds.charset = 'UTF-8';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+     })();
+</script>
+<!-- 多说公共JS代码 end -->  
+</section>
+
+                <div class="clearfix"></div>
+            </footer>
+        
+    </div>
+</article>
+</div></div>
+    <div class="clearfix"></div>
+  </div>
+
+  <div id="footer-wrapper">
+    <footer id="footer" class="inner">
+<div class="aligncenter">
+	<a href="https://github.com/cinvro/hexo-theme-perry">Perry</a> by <a href="http://cinvro.com">cinvro </a>
+</div>
+
+<div class="aligncenter">
+  
+  &copy; 2015 Edward Zhu
+  
+</div>
+
+<div class="clearfix"></div></footer>
+    <script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>
