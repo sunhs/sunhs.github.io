@@ -1,0 +1,255 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>common lisp 变量绑定与函数调用 | Sword and Poem</title>
+  <meta name="author" content="Edward Zhu">
+  
+  <meta name="description" content="Just for fun.">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="common lisp 变量绑定与函数调用"/>
+  <meta property="og:site_name" content="Sword and Poem"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  <link href="/favicon.png" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="Sword and Poem" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+  
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="group-text">
+	<nav id="main-nav">
+	  <ul>
+	    
+	      <li><a href="/">Home</a></li>
+	    
+	      <li><a href="/archives">Archives</a></li>
+	    
+	  </ul>
+	  <div class="clearfix"></div>
+	</nav>
+	<div class="main-header">
+	  <h1><a href="/">Sword and Poem</a></h1>
+	  <h2><a href="/"></a></h2>
+	</div>
+	<div class="clearfix"></div>
+</div></header>
+  <div id="content" class="inner">
+    <div id="main-col"><div id="wrapper"><article class="post">
+    
+        <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+    
+    <div class="post-content">
+        <header>
+            
+                <time datetime="2016-01-25T05:19:17.000Z"><a href="/2016-01-25-common-lisp-变量绑定与函数调用/">2016-01-25</a></time>
+            
+            
+  
+    <h1 class="title">common lisp 变量绑定与函数调用</h1>
+  
+
+        </header>
+        
+            <div class="entry">
+                
+  
+  <!-- <div class="before-tags"><a></a></div> -->
+  <div class="tags">
+    <a href="/tags/lisp/">lisp</a>  <a href="/tags/common-lisp/">common lisp</a>
+  </div>
+
+
+                <p>作为 emacs 使用者，lisp 在我心中有神圣的地位。长久以来，在用 elisp 进行编辑器配置的时候，总有点力不从心，只能看着别人的 elisp 代码，猜测语法，依样画葫芦。这两天终于决定学习 lisp（没错就是为了充值信仰）。正好朋友手边有《实用 common lisp 编程》这本书，就选择了 common lisp 入手。</p>
+<p>其实在 lisp 的众多方言中选择，是一件很烧脑的事（没错我是选择强迫症）。在 lisp 家族和 scheme 家族中，大家的说法大致都是：lisp 扩展多，工业化，实用，但是 ugly，充满各种 wart，为了兼容性而贴上各种补丁；scheme 最小化 lisp，保持优雅与简洁，其学术性大于实用性。最终选择 common lisp，是想体会一下用 lisp 开发的感觉，并且其与 elisp 的相似性也是吸引我的重要原因。</p>
+<h2 id="变量绑定">变量绑定</h2>
+<p>Common lisp 中有两个重要的概念：词法变量与动态变量（或特殊变量）。两者的不同点，除了定义变量时不一样，还体现在函数引用外部变量时行为的差异性（目前为止我只发现这样的区别）。</p>
+<p>通常我们使用 <code>(let (variables*) body-form*)</code> 的形式时，绑定形式都引入词法变量。当 <code>let</code> 执行结束后，这些变量重新引用 <code>let</code> 执行之前它们引用的内容（如果有的话）。</p>
+<p>当使用 <code>(defvar *var* 1)</code> 或者是 <code>(defparameter *var* 1)</code> 时，定义的是动态变量。注意，在习惯上，动态变量使用 <code>*var*</code> 的形式命名。当我们对一个动态变量进行 <code>let</code> 操作时，在 <code>let</code> 的内部该变量都被绑定到新的内容，直到 <code>let</code> 结束。</p>
+<p>这两者的差异，在被嵌套函数引用时表现得最明显。当嵌套函数引用词法变量时，形成了函数闭包。</p>
+<pre><code><span class="list">(<span class="title">setq</span> f
+      <span class="list">(<span class="title"><span class="built_in">let</span></span> <span class="list">(<span class="list">(<span class="title">p1</span><span class="number"> 10</span>)</span>)</span>
+        <span class="list">(<span class="title">lambda</span> <span class="list">()</span>
+          <span class="list">(<span class="title">print</span> p1)</span>
+          <span class="list">(<span class="title">setq</span> p1<span class="number"> 1</span>)</span>
+          <span class="list">(<span class="title">print</span> p1)</span>)</span>)</span>)</span>
+<span class="list">(<span class="title"><span class="built_in">let</span></span> <span class="list">(<span class="list">(<span class="title">p1</span><span class="number"> 100</span>)</span>)</span>
+  <span class="list">(<span class="title">funcall</span> f)</span>)</span> <span class="comment">;; In lexical scoping case, f is a closure, which means that the binding `p1=10` would be used any time f is called. Prints "10 1"</span>
+</code></pre><p>在上面的代码里，我们定义了词法变量 <code>p1</code>，其值为 <code>10</code>。匿名函数引用了这个词法变量，形成函数闭包。我们把这个匿名函数赋予变量 <code>f</code>，于是不论我们在何处调用 <code>f</code>，其引用的变量 <code>p1</code> 的值都是 <code>10</code>。即使在定义了值为 <code>100</code> 的词法变量 <code>p1</code> 的 <code>let</code> 体内，<code>f</code> 都捕捉到 <code>p1=10</code> 的绑定。</p>
+<p>对于熟悉闭包的同学来说，这一点是美丽而正常的。可是在动态变量的例子中，一切都变了。</p>
+<p>我们先看第一个例子:</p>
+<pre><code><span class="comment">;; case 1</span>
+<span class="list">(<span class="title">defparameter</span> <span class="variable">*p1*</span> <span class="number">10</span>)</span> <span class="comment">;; dynamic variable</span>
+<span class="list">(<span class="title">setq</span> f
+      <span class="list">(<span class="title">lambda</span> <span class="list">()</span>
+        <span class="list">(<span class="title">print</span> <span class="variable">*p1*</span>)</span>
+        <span class="list">(<span class="title">setq</span> <span class="variable">*p1*</span> <span class="number">1</span>)</span>
+        <span class="list">(<span class="title">print</span> <span class="variable">*p1*</span>)</span>)</span>)</span>
+<span class="list">(<span class="title">funcall</span> f)</span> <span class="comment">;; *p1* is changed globally. Prints "10 1"</span>
+<span class="list">(<span class="title">print</span> <span class="variable">*p1*</span>)</span> <span class="comment">;; Prints "1"</span>
+</code></pre><p>在这个例子里，函数 <code>f</code> 应用并改变了全局定义的动态变量 <code>*p1*</code>，这跟大部分主流语言的行为相同。</p>
+<pre><code><span class="comment">;; case 2</span>
+<span class="list">(<span class="title">defparameter</span> <span class="variable">*p1*</span> <span class="number">10</span>)</span>
+<span class="list">(<span class="title">let</span> <span class="list">(<span class="list">(<span class="title">*p1*</span> <span class="number">20</span>)</span>)</span>
+  <span class="list">(<span class="title">funcall</span> f)</span>)</span> <span class="comment">;; *p1* is changed inside `let`. Prints "20 1"</span>
+<span class="list">(<span class="title">print</span> <span class="variable">*p1*</span>)</span> <span class="comment">;; *p1* outside `let` remains unchanged. Prints "10"</span>
+</code></pre><p>在这第二个例子中，我们用 <code>let</code> 创建了新的绑定，使得 <code>*p1*</code> 的值在该作用域内变成了 <code>20</code>。按照函数闭包的思路，此时调用 <code>f</code>，应该打印 <code>10 1</code>，但结果却是 <code>20 1</code>。这是因为 <code>f</code> 引用了动态变量而不是词法变量，此时 <code>f</code> 里的 <code>*p1</code> 的值是根据调用 <code>f</code> 时的上下文确定的，不能再用闭包的思路来考虑。最后离开 <code>let</code> 时，恢复原来的绑定，<code>*p1*</code> 的值变回 <code>10</code>。</p>
+<pre><code><span class="comment">;; case 3</span>
+<span class="list">(<span class="title">defparameter</span> <span class="variable">*p1*</span> <span class="number">10</span>)</span> <span class="comment">;; dynamic variable</span>
+<span class="list">(<span class="title">setq</span> f
+      <span class="list">(<span class="title">let</span> <span class="list">(<span class="list">(<span class="title">*p1*</span> <span class="number">20</span>)</span>)</span>
+        <span class="list">(<span class="title">lambda</span> <span class="list">()</span>
+          <span class="list">(<span class="title">print</span> <span class="variable">*p1*</span>)</span>
+          <span class="list">(<span class="title">setq</span> <span class="variable">*p1*</span> <span class="number">1</span>)</span>
+          <span class="list">(<span class="title">print</span> <span class="variable">*p1*</span>)</span>)</span>)</span>)</span>
+<span class="list">(<span class="title">funcall</span> f)</span> <span class="comment">;; Dynamically referenced *p1* outside `let`. Prints "10 1"</span>
+<span class="list">(<span class="title">print</span> <span class="variable">*p1*</span>)</span> <span class="comment">;; *p1* outside `let` is changed. Prints "1"</span>
+</code></pre><p>例子 1 和 2 在定义 <code>f</code> 时，引用的是全局定义的 <code>*p1*</code>。例子 3 中我们在局部重新绑定 <code>*p1*</code> 后定义 <code>f</code>。从打印结果看，这种行为并不影响动态变量的性质，<code>f</code> 捕捉的 <code>*p1*</code> 的绑定仍然是在调用时确定的。而由于例子 3 里 <code>f</code> 引用了全局定义的 <code>*p1*</code>，所以 <code>*p1*</code> 在全局范围内的值都改变了。</p>
+<pre><code><span class="comment">;; case 4</span>
+<span class="comment">;; same as case 2</span>
+<span class="list">(<span class="title">defparameter</span> <span class="variable">*p1*</span> <span class="number">10</span>)</span>
+<span class="list">(<span class="title">let</span> <span class="list">(<span class="list">(<span class="title">*p1*</span> <span class="number">20</span>)</span>)</span>
+  <span class="list">(<span class="title">funcall</span> f)</span>)</span>
+<span class="list">(<span class="title">print</span> <span class="variable">*p1*</span>)</span>
+</code></pre><p>这个例子跟例子 2 相同。</p>
+<pre><code><span class="comment">;; case 5</span>
+<span class="list">(<span class="title">defparameter</span> <span class="variable">*p1*</span> <span class="number">10</span>)</span>
+<span class="list">(<span class="title">let</span> <span class="list">(<span class="list">(<span class="title">p</span> <span class="number">20</span>)</span>)</span>
+  <span class="list">(<span class="title">funcall</span> f)</span>)</span> <span class="comment">;; *p1* outside `let` is changed. Prints "10 1"</span>
+<span class="list">(<span class="title">print</span> <span class="variable">*p1*</span>)</span> <span class="comment">;; Prints 1</span>
+</code></pre><p>这个也没什么好说的。</p>
+<p>王垠在他的文章中写到，他十分痛恨动态作用域的方式，而很久之后 common lisp 才把这件事情做对。我想，CL 大概是引入了词法作用域，使得函数闭包正常工作；同时又保留了动态作用域，以在某些特殊场景发挥作用。</p>
+<p>关于函数闭包有一点需要注意的，即它闭合的不是自由变量的值，而是绑定。看这个例子（关于 <code>#&#39;</code> 语法糖的说明见下一节<a href="#函数调用">函数调用</a>）：</p>
+<pre><code><span class="list">(<span class="title">defparameter</span> outter
+  <span class="list">(<span class="title">let</span> <span class="list">(<span class="list">(<span class="title">a</span> <span class="number">0</span>)</span>)</span>
+    <span class="list">(<span class="title">defun</span> in<span class="number">0</span> <span class="list">()</span>
+      <span class="list">(<span class="title">incf</span> a)</span>
+      <span class="list">(<span class="title">print</span> a)</span>)</span>
+    <span class="list">(<span class="title">defun</span> in<span class="number">1</span> <span class="list">()</span>
+      <span class="list">(<span class="title">print</span> a)</span>)</span>
+    <span class="list">(<span class="title">list</span> #<span class="quoted">'in0</span> #<span class="quoted">'in1</span>)</span>)</span>)</span>
+
+<span class="list">(<span class="title">funcall</span> <span class="list">(<span class="title">nth</span> <span class="number">0</span> outter)</span>)</span> <span class="comment">;; Prints 1</span>
+<span class="list">(<span class="title">funcall</span> <span class="list">(<span class="title">nth</span> <span class="number">1</span> outter)</span>)</span> <span class="comment">;; Prints 1</span>
+</code></pre><p>我们定义了一个变量 outter，它返回一个包含两个函数闭包的列表。每个函数闭包都引用了自由变量 <code>a</code>。调用<code>闭包1</code>时，<code>a</code> 变为 <code>1</code>，并打印 <code>1</code>。调用<code>闭包2</code>时，假如闭合的是变量的值，那么<code>闭包2</code>中 <code>a</code> 仍然应该是 <code>0</code>。实际上，<code>闭包2</code> 中 <code>a</code> 的值随着 <code>闭包1</code> 的调用而改变了，说明两者都闭合着绑定；因此<code>闭包1</code>改变了绑定的行为在<code>闭包2</code>中体现出来了。</p>
+<h2 id="函数调用">函数调用</h2>
+<p>函数名与变量名拥有不同的命名空间，是 Common Lisp 另一个为人诟病的地方（也有人觉得这是由于设计思想不同）。也就是说，对于一个 Symbol，在变量 ns 中它指向一个变量；对应地，在函数 ns 中指向一个函数。那么我们怎么区分一个名字（其对应着一个 Symbol）究竟是对函数的引用还是对变量的引用呢？</p>
+<p>假设我们有一个名字 <code>var</code>，当我们引用它时，默认会在对应符号的变量 ns 中搜索对象，以及求值。当名为 <code>var</code> 的变量不存在时，报错，即使名为 <code>var</code> 的函数存在。</p>
+<p>Common Lisp 中的 <code>FUNCTION</code> 特殊操作符，就是用于得到某个符号所对应的函数对象。<code>FUNCTION</code> 有个语法糖 <code>#&#39;</code>，也就是说，当我们使用 <code>#&#39;var</code> 时，解释器就知道我们想要在 <code>VAR</code> 这个符号的函数 ns 中搜索对应的函数对象；或者说，我们想用一个叫做 <code>var</code> 的函数而不是变量。</p>
+<p>我们看下面两种定义函数的方法。</p>
+<pre><code><span class="list">(<span class="title">defun</span> f<span class="number">1</span> <span class="list">()</span>
+  <span class="list">(<span class="title">print</span> <span class="string">"f1"</span>)</span>)</span>
+
+<span class="list">(<span class="title">defparameter</span> f<span class="number">2</span> <span class="literal">nil</span>)</span>
+<span class="list">(<span class="title">setq</span> f<span class="number">2</span>
+      <span class="list">(<span class="title">lambda</span> <span class="list">()</span>
+        <span class="list">(<span class="title">print</span> <span class="string">"f2"</span>)</span>)</span>)</span>
+</code></pre><p>其中第一种是常用的方法，它定义了一个函数 ns 里的名字 <code>f1</code>；第二种定义了一个变量 ns 里的名字 <code>f2</code>，并指向一个函数对象。</p>
+<p>我们有两种调用函数的方法。</p>
+<pre><code><span class="list">(<span class="title">function-name</span> parameters*)</span>
+
+<span class="list">(<span class="title">funcall</span> var parameters*)</span>
+</code></pre><p>当我们用第一种方法时，要求 <code>function-name</code> 是一个函数名。</p>
+<p>当我们使用 <code>(funcall var parameters*)</code> 的形式调用函数时，解释器首先会对 <code>var</code> 和参数们进行求值。</p>
+<p>所以对于函数 <code>f1</code>，我们可以用 <code>(f1)</code> 调用，也可以用 <code>(funcall #&#39;f1)</code>。为什么后者需要用 <code>#&#39;</code> 呢？因为如果不用，解释器默认会在 <code>F1</code> 这个符号的变量命名空间中搜索，而名为 <code>f1</code> 的变量并不存在。所以要用 <code>#&#39;</code> 告诉解释器，去 <code>F1</code> 的函数命名空间中搜索。</p>
+<p>对于函数 <code>f2</code>，我们不能用 <code>(f2)</code> 调用，因为它不是一个函数名。我尝试用 <code>(#&#39;f2)</code> 也不行，可能是这种函数调用的方式跟第二种不同，不是简单地去符号的名称空间搜索。所以我们需要使用 <code>(funcall f2)</code>，由于名为 <code>f2</code> 的变量存在，它被求值得到一个函数对象，丢给 <code>funcall</code> 调用。</p>
+<h2 id="Summary">Summary</h2>
+<p>Common Lisp 的这两大特点，我学习的时候头都大了（即使现在总结的时候，也发现了很多新问题）。写下这篇文章，就是为了<del>看看有多少人也迷迷糊糊，以证明我智商没问题</del>让大家尽快地理解。</p>
+<p>当然，由于还学得不够深入，本文只能算是阐述一下个人观点，肯定还有很多没解决的疑问，也存在很多不足。待我去书海遨游一番，再回来完善。</p>
+
+            </div>
+            <footer>
+                
+<nav id="article-nav">
+  
+    <a href="/2016-01-25-common-lisp-变量绑定与函数调用/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">prev</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015-10-14-非递归二叉树遍历/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">next</strong>
+      <div class="article-nav-title">非递归二叉树遍历</div>
+    </a>
+  
+</nav>
+
+                
+<section id="comment">
+  <!-- <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div> -->
+  <!-- 多说评论框 start -->
+  <div class="ds-thread" data-thread-key="2016-01-25-common-lisp-变量绑定与函数调用/" data-title="common lisp 变量绑定与函数调用" data-url="http://sunhs.github.io/2016-01-25-common-lisp-变量绑定与函数调用/"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"hyesun"};
+    (function() {
+                var ds = document.createElement('script');
+                ds.type = 'text/javascript';ds.async = true;
+                ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                ds.charset = 'UTF-8';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+     })();
+</script>
+<!-- 多说公共JS代码 end -->  
+</section>
+
+                <div class="clearfix"></div>
+            </footer>
+        
+    </div>
+</article>
+</div></div>
+    <div class="clearfix"></div>
+  </div>
+
+  <div id="footer-wrapper">
+    <footer id="footer" class="inner">
+<div class="aligncenter">
+	<a href="https://github.com/cinvro/hexo-theme-perry">Perry</a> by <a href="http://cinvro.com">cinvro </a>
+</div>
+
+<div class="aligncenter">
+  
+  &copy; 2016 Edward Zhu
+  
+</div>
+
+<div class="clearfix"></div></footer>
+    <script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>
